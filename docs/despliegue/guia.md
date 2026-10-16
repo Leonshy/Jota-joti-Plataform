@@ -1,4 +1,4 @@
-# Despliegue en Plesk — jota-joti.naranja.com.py
+# Despliegue en Plesk — jotajoti.naranja.com.py
 
 Mismo método que Cateura: commit → push a GitHub → `git pull` en el servidor. Los comandos los corre una persona
 por SSH. `public/build` no está en git y se sube aparte con `scp`.
@@ -6,8 +6,8 @@ por SSH. `public/build` no está en git y se sube aparte con `scp`.
 | Dato | Valor |
 |---|---|
 | Servidor | `64.176.19.59`, puerto `22`, usuario `naranjacom` |
-| Carpeta del proyecto | `/var/www/vhosts/naranja.com.py/jota-joti.naranja.com.py/` |
-| Document Root (Plesk) | `…/jota-joti.naranja.com.py/public` |
+| Carpeta del proyecto | `/var/www/vhosts/naranja.com.py/jotajoti.naranja.com.py/` |
+| Document Root (Plesk) | `…/jotajoti.naranja.com.py/public` |
 | PHP | `/opt/plesk/php/8.3/bin/php` (8.3.35; el `php` por defecto del shell puede ser otro) |
 | Composer | `/usr/local/psa/var/modules/composer/composer.phar` (el `/usr/local/bin/composer` es un wrapper: no sirve con `php`) |
 | Repo | `https://github.com/Leonshy/Jota-joti-Plataform.git` (público, se clona por HTTPS) |
@@ -21,7 +21,7 @@ alias composer='/opt/plesk/php/8.3/bin/php /usr/local/psa/var/modules/composer/c
 
 ## 0. Antes de empezar (en el panel de Plesk)
 
-1. Suscripción/subdominio `jota-joti.naranja.com.py` creado, con PHP 8.3 (FPM).
+1. Suscripción/subdominio `jotajoti.naranja.com.py` creado, con PHP 8.3 (FPM).
 2. Extensiones de PHP activas: `gd`, `intl`, `pdo_mysql`, `mbstring`, `fileinfo`, `zip`.
 3. **Document Root = `public`** (Hosting y DNS → Apache & nginx, o Configuración de hosting). Si queda en la raíz, el
    `.env` queda expuesto por la web.
@@ -32,7 +32,7 @@ alias composer='/opt/plesk/php/8.3/bin/php /usr/local/psa/var/modules/composer/c
 
 ```bash
 ssh naranjacom@64.176.19.59
-cd /var/www/vhosts/naranja.com.py/jota-joti.naranja.com.py/
+cd /var/www/vhosts/naranja.com.py/jotajoti.naranja.com.py/
 ls -la            # si hay archivos de relleno de Plesk (index.html, etc.), borrarlos: el clone pide carpeta vacía
 
 git clone https://github.com/Leonshy/Jota-joti-Plataform.git .
@@ -40,7 +40,7 @@ composer install --no-dev --optimize-autoloader --no-interaction
 
 cp .env.production.example .env
 php artisan key:generate           # escribe APP_KEY en el .env
-nano .env                          # APP_URL=https://jota-joti.naranja.com.py y DB_DATABASE / DB_USERNAME / DB_PASSWORD
+nano .env                          # APP_URL=https://jotajoti.naranja.com.py y DB_DATABASE / DB_USERNAME / DB_PASSWORD
 chmod 600 .env
 ```
 
@@ -48,7 +48,7 @@ Subir los estilos y scripts, **desde la Mac** (en la carpeta del repo):
 
 ```bash
 npm ci && npm run build
-scp -r public/build/ naranjacom@64.176.19.59:/var/www/vhosts/naranja.com.py/jota-joti.naranja.com.py/public/
+scp -r public/build/ naranjacom@64.176.19.59:/var/www/vhosts/naranja.com.py/jotajoti.naranja.com.py/public/
 ```
 
 De vuelta en el servidor:
@@ -67,8 +67,8 @@ El último comando debe terminar sin problemas críticos. Si marca algo, se corr
 
 | Frecuencia | Comando |
 |---|---|
-| Cada minuto | `/opt/plesk/php/8.3/bin/php /var/www/vhosts/naranja.com.py/jota-joti.naranja.com.py/artisan schedule:run` |
-| Cada minuto | `/opt/plesk/php/8.3/bin/php /var/www/vhosts/naranja.com.py/jota-joti.naranja.com.py/artisan queue:work --stop-when-empty --max-time=55` |
+| Cada minuto | `/opt/plesk/php/8.3/bin/php /var/www/vhosts/naranja.com.py/jotajoti.naranja.com.py/artisan schedule:run` |
+| Cada minuto | `/opt/plesk/php/8.3/bin/php /var/www/vhosts/naranja.com.py/jotajoti.naranja.com.py/artisan queue:work --stop-when-empty --max-time=55` |
 
 - `schedule:run` dispara lo que define `routes/console.php`: respaldo de la base cada hora (`:00`), `jota:reconciliar`
   (`:10`), `backup:monitor` (`:30`) y la limpieza de respaldos viejos a las 03:30.
@@ -83,7 +83,7 @@ El último comando debe terminar sin problemas críticos. Si marca algo, se corr
 - `jota:verificar-produccion` marca error si falta la contraseña. Si `mysqldump` no está en el PATH, poné su carpeta en `DB_DUMP_PATH`.
 - Probar una vez en el servidor: `php artisan backup:run --only-db` y `php artisan backup:list` (debe verse «Healthy»).
 - **Copia fuera del servidor:** un respaldo en el mismo servidor no sirve si el servidor se pierde. Antes del evento, y al
-  cerrarlo, bajar el último a la Mac: `scp "naranjacom@64.176.19.59:/var/www/vhosts/naranja.com.py/jota-joti.naranja.com.py/storage/app/private/JOTA-JOTI 2026/*.zip" ~/respaldos-jota/`
+  cerrarlo, bajar el último a la Mac: `scp "naranjacom@64.176.19.59:/var/www/vhosts/naranja.com.py/jotajoti.naranja.com.py/storage/app/private/JOTA-JOTI 2026/*.zip" ~/respaldos-jota/`
 - **Restaurar:** descomprimir el zip con la contraseña (7-Zip/Keka; el `unzip` de macOS no abre zips con AES), y luego
   `gunzip -c db-dumps/mysql-<base>.sql.gz | mysql -u USUARIO -p BASE`.
 
@@ -92,7 +92,7 @@ El último comando debe terminar sin problemas críticos. Si marca algo, se corr
 En la Mac: `git push origin main`; si cambió CSS/JS, `npm run build` y el `scp` de `public/build/`. En el servidor:
 
 ```bash
-cd /var/www/vhosts/naranja.com.py/jota-joti.naranja.com.py/
+cd /var/www/vhosts/naranja.com.py/jotajoti.naranja.com.py/
 bash deploy-jota.sh
 ```
 
