@@ -86,7 +86,8 @@ class Activar extends Component
         session()->regenerate();
         session()->flash('bienvenida', strtok($user->name, ' '));
 
-        $this->redirect(DestinoPorRol::para($user));
+        // Si venía de escanear un QR con la cámara del sistema, vuelve a esa acción en lugar de ir al inicio.
+        $this->redirectIntended(DestinoPorRol::para($user));
     }
 
     public function volver(): void

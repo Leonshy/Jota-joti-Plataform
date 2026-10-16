@@ -123,9 +123,9 @@ Se quitó el aviso «muy pronto»: ya no queda ninguna pantalla pendiente. 973 t
 **Estaciones JOTA — reglas nuevas (16/10/2026):** siempre por equipo (los Rovers, como unidad), un solo equipo por horario (cupo 1, disponible u
 ocupado) y una sola estación reservada por equipo a la vez hasta que termine. Migración `equipos_por_unidad` (reservas y cumplimientos pueden
 ser de una unidad); cada Rover recibe los puntos y LisCoins completos. 1.023 tests y 50 pruebas de navegador.
-**Pendiente:** aprobación del diseño y del copy por Leonardo; fuente definitiva y tema del panel Filament
-(sigue con los colores por defecto); pantalla de entrada real (`/` todavía es la página de bienvenida de
-Laravel); al hacer el login, respetar la URL de destino para retomar el QR escaneado con la cámara del sistema.
+**Retomar el destino tras ingresar o activar — hecho:** quien escanea un QR sin sesión pasa por Ingresar (o Activar, si es su primer ingreso)
+y vuelve a ese QR. La raíz `/` redirige: sin sesión a `/ingresar`, con sesión a la pantalla de su rol. 1.029 tests.
+**Pendiente:** aprobación del diseño y del copy por Leonardo; fuente definitiva y tema del panel Filament (sigue con los colores por defecto).
 
 **Cierre:** diseño aprobado.
 

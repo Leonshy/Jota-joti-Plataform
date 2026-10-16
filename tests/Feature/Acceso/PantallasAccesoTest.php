@@ -98,6 +98,18 @@ it('quien ya tiene sesión no ve el ingreso: lo mandan a su pantalla', function 
 
 // ── Activación ──────────────────────────────────────────────────────────────
 
+it('quien activa su cuenta al escanear un QR vuelve a ese QR y no al inicio', function () {
+    $user = User::factory()->sinActivar()->create();
+    $destino = url('/asistencia/7/registrar/abc');
+
+    $this->get($destino)->assertRedirect(route('ingresar'));
+
+    Livewire::test(Activar::class)
+        ->set('ci', $user->ci)->call('continuar')
+        ->set('pin', '4321')->set('pinRepetido', '4321')->call('crear')
+        ->assertRedirect($destino);
+});
+
 it('crea el PIN en dos pasos y entra con la bienvenida', function () {
     $user = User::factory()->sinActivar()->create(['name' => 'Ana María Benítez']);
 
