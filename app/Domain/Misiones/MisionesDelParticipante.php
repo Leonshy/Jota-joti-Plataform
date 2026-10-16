@@ -17,7 +17,7 @@ use Illuminate\Support\Collection;
 class MisionesDelParticipante
 {
     /**
-     * @return list<array{id: int, titulo: string, por_patrulla: bool, puntos: int, estado: string, vence_at: CarbonInterface|null}>
+     * @return list<array{id: int, titulo: string, lugar: string|null, por_patrulla: bool, puntos: int, estado: string, vence_at: CarbonInterface|null}>
      */
     public function lista(User $user): array
     {
@@ -28,6 +28,7 @@ class MisionesDelParticipante
             ->map(fn (Mision $m) => [
                 'id' => $m->getKey(),
                 'titulo' => $m->titulo,
+                'lugar' => $m->lugar,
                 'por_patrulla' => $m->esPorPatrulla(),
                 'puntos' => $m->puntos,
                 'estado' => $this->estado($m, $entregas->get($m->getKey(), collect())),

@@ -14,6 +14,7 @@
                     <x-ui.tarjeta class="flex flex-col gap-3">
                         <div>
                             <p class="font-bold">{{ $r['actividad'] }}</p>
+                            <x-ui.lugar>{{ $r['lugar'] ?? '' }}</x-ui.lugar>
                             <p class="numeros text-lg font-bold text-titulo">{{ cuando($r['inicio']) }} – {{ $r['fin']->format('H:i') }}</p>
                             @if ($r['por_equipo'])<p class="text-sm text-texto-suave">{{ __('jota.actividades.para_equipo') }}</p>@endif
                         </div>

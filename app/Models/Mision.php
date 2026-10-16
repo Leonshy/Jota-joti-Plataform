@@ -19,7 +19,7 @@ class Mision extends Model
 
     protected $table = 'misiones';
 
-    protected $fillable = ['titulo', 'descripcion', 'modalidad', 'puntos', 'lanza_at', 'vence_at', 'cerrada_at'];
+    protected $fillable = ['titulo', 'lugar', 'descripcion', 'modalidad', 'puntos', 'lanza_at', 'vence_at', 'cerrada_at'];
 
     protected function casts(): array
     {
@@ -86,6 +86,6 @@ class Mision extends Model
     /** Auditoría de cambios de configuración: quién cambió qué y cuándo (§4.9). Nunca saldos. */
     public function getActivitylogOptions(): LogOptions
     {
-        return LogOptions::defaults()->useLogName('configuracion')->logOnly(['titulo', 'descripcion', 'modalidad', 'puntos', 'lanza_at', 'vence_at', 'cerrada_at'])->logOnlyDirty()->dontSubmitEmptyLogs();
+        return LogOptions::defaults()->useLogName('configuracion')->logOnly(['titulo', 'lugar', 'descripcion', 'modalidad', 'puntos', 'lanza_at', 'vence_at', 'cerrada_at'])->logOnlyDirty()->dontSubmitEmptyLogs();
     }
 }

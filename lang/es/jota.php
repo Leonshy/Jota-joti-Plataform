@@ -31,6 +31,7 @@ return [
         'cerrar_sesion' => 'Cerrar sesión',
         'cargando' => 'Cargando…',
         'se_actualiza' => 'Se actualiza sola',
+        'lugar' => 'Lugar',
         'hoy' => 'Hoy',
         'ayer' => 'Ayer',
         'puntos' => 'puntos',

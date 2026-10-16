@@ -40,7 +40,7 @@ beforeEach(function () {
 it('crea una misión con sus unidades, puntaje y horarios', function () {
     Livewire::test(CreateMision::class)
         ->fillForm([
-            'titulo' => 'Nudos en equipo', 'descripcion' => 'Armen un nudo de ocho.',
+            'titulo' => 'Nudos en equipo', 'lugar' => 'Campo de patrullas', 'descripcion' => 'Armen un nudo de ocho.',
             'modalidad' => Modalidad::Patrulla->value, 'puntos' => 50,
             'unidades' => [$this->e->unidad->id],
             'lanza_at' => now()->addHour()->format('Y-m-d H:i'), 'vence_at' => now()->addHours(5)->format('Y-m-d H:i'),
@@ -57,7 +57,7 @@ it('crea una misión con sus unidades, puntaje y horarios', function () {
 it('valida la misión: puntaje positivo, unidades y vencimiento posterior al lanzamiento', function () {
     Livewire::test(CreateMision::class)
         ->fillForm([
-            'titulo' => 'X', 'descripcion' => 'Y', 'modalidad' => Modalidad::Individual->value, 'puntos' => 0,
+            'titulo' => 'X', 'lugar' => 'Z', 'descripcion' => 'Y', 'modalidad' => Modalidad::Individual->value, 'puntos' => 0,
             'unidades' => [], 'lanza_at' => now()->addHours(3)->format('Y-m-d H:i'), 'vence_at' => now()->addHour()->format('Y-m-d H:i'),
         ])
         ->call('create')
@@ -121,7 +121,7 @@ it('una misión con entregas no se borra ni cambia de puntaje o modalidad', func
 it('crea una actividad que puede valer 0 puntos', function () {
     Livewire::test(CreateActividad::class)
         ->fillForm([
-            'titulo' => 'Estación de radioaficionados', 'tipo' => TipoActividad::EstacionJota->value,
+            'titulo' => 'Estación de radioaficionados', 'lugar' => 'Carpa de radio', 'tipo' => TipoActividad::EstacionJota->value,
             'modalidad' => Modalidad::Individual->value, 'puntos' => 0, 'unidades' => [$this->e->unidad->id],
         ])
         ->call('create')

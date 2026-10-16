@@ -44,7 +44,7 @@
                 @endif
                 @if ($resumen['proximo_turno'])
                     <x-ui.fila :href="route('app.actividades')" icono="calendar-days" :titulo="__('jota.inicio.proximo_turno')"
-                        :subtitulo="$resumen['proximo_turno']['actividad'].' · '.($resumen['proximo_turno']['por_patrulla']
+                        :subtitulo="$resumen['proximo_turno']['actividad'].(filled($resumen['proximo_turno']['lugar'] ?? null) ? ' · '.$resumen['proximo_turno']['lugar'] : '').' · '.($resumen['proximo_turno']['por_patrulla']
                             ? __('jota.inicio.turno_patrulla', ['cuando' => cuando($resumen['proximo_turno']['inicio'])])
                             : cuando($resumen['proximo_turno']['inicio']))" />
                 @endif

@@ -13,6 +13,7 @@ class MisionFactory extends Factory
     {
         return [
             'titulo' => fake()->sentence(3),
+            'lugar' => 'Plaza central',
             'descripcion' => fake()->paragraph(),
             'modalidad' => Modalidad::Individual,
             'puntos' => 50,

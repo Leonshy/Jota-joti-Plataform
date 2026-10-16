@@ -3,6 +3,7 @@
     @php($entrega = $detalle['entrega'])
     <div class="flex flex-col gap-3">
         <h1 class="text-2xl text-titulo">{{ $mision->titulo }}</h1>
+        <x-ui.lugar>{{ $mision->lugar }}</x-ui.lugar>
         <div class="flex flex-wrap gap-2">
             <x-ui.insignia tono="marca">{{ $mision->esPorPatrulla() ? __('jota.misiones.patrulla') : __('jota.misiones.individual') }}</x-ui.insignia>
             <x-ui.insignia tono="info">{{ cantidad($mision->puntos, 'punto') }}</x-ui.insignia>

@@ -22,7 +22,7 @@ class ResumenParticipante
      *     puntos: int, jlis: int,
      *     patrulla: array{nombre: string, puntos: int}|null,
      *     misiones_por_entregar: int,
-     *     proximo_turno: array{actividad: string, inicio: CarbonInterface, por_patrulla: bool}|null
+     *     proximo_turno: array{actividad: string, lugar: string|null, inicio: CarbonInterface, por_patrulla: bool}|null
      * }
      */
     public function __invoke(User $user): array
@@ -84,12 +84,13 @@ class ResumenParticipante
                     $q->orWhere('reservas.unidad_id', $user->unidad_id);
                 }
             })
-            ->with('turno.actividad:id,titulo')
+            ->with('turno.actividad:id,titulo,lugar')
             ->orderBy('turnos.inicio')
             ->first();
 
         return $reserva ? [
             'actividad' => $reserva->turno->actividad->titulo,
+            'lugar' => $reserva->turno->actividad->lugar,
             'inicio' => $reserva->turno->inicio,
             'por_patrulla' => $reserva->user_id === null,
         ] : null;

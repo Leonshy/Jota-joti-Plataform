@@ -18,7 +18,7 @@ class AgendaDelParticipante
 {
     /**
      * @return list<array{
-     *     id: int, titulo: string, taller: bool, por_equipo: bool, puntos: int,
+     *     id: int, titulo: string, lugar: string|null, taller: bool, por_equipo: bool, puntos: int,
      *     turnos: list<array{id: int, inicio: CarbonInterface, fin: CarbonInterface, lugares: int|null, comenzado: bool, reservado: bool}>
      * }>
      */
@@ -34,6 +34,7 @@ class AgendaDelParticipante
             ->map(fn (Actividad $a) => [
                 'id' => $a->getKey(),
                 'titulo' => $a->titulo,
+                'lugar' => $a->lugar,
                 'taller' => $a->tipo->value === 'taller',
                 'por_equipo' => $a->esPorEquipo(),
                 'puntos' => $a->puntos,
@@ -52,29 +53,30 @@ class AgendaDelParticipante
     /**
      * La estación JOTA que el equipo de la persona tiene reservada y todavía no terminó (solo se puede una a la vez).
      *
-     * @return array{actividad: string, inicio: CarbonInterface, fin: CarbonInterface}|null
+     * @return array{actividad: string, lugar: string|null, inicio: CarbonInterface, fin: CarbonInterface}|null
      */
     public function estacionReservada(User $user): ?array
     {
         $equipo = EquipoDeReserva::de($user);
         $reserva = $equipo ? Reservar::estacionVigente($equipo) : null;
 
-        return $reserva ? ['actividad' => $reserva->turno->actividad->titulo, 'inicio' => $reserva->turno->inicio, 'fin' => $reserva->turno->fin] : null;
+        return $reserva ? ['actividad' => $reserva->turno->actividad->titulo, 'lugar' => $reserva->turno->actividad->lugar, 'inicio' => $reserva->turno->inicio, 'fin' => $reserva->turno->fin] : null;
     }
 
     /**
      * Reservas vigentes (turnos que no terminaron), las más próximas primero.
      *
-     * @return list<array{id: int, actividad: string, inicio: CarbonInterface, fin: CarbonInterface, por_equipo: bool, comenzado: bool}>
+     * @return list<array{id: int, actividad: string, lugar: string|null, inicio: CarbonInterface, fin: CarbonInterface, por_equipo: bool, comenzado: bool}>
      */
     public function reservas(User $user): array
     {
         return $this->consultaReservas($user)
-            ->with('turno.actividad:id,titulo')
+            ->with('turno.actividad:id,titulo,lugar')
             ->get()
             ->map(fn (Reserva $r) => [
                 'id' => $r->getKey(),
                 'actividad' => $r->turno->actividad->titulo,
+                'lugar' => $r->turno->actividad->lugar,
                 'inicio' => $r->turno->inicio,
                 'fin' => $r->turno->fin,
                 'por_equipo' => $r->user_id === null,

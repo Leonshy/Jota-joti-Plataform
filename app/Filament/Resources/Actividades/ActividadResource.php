@@ -54,6 +54,8 @@ class ActividadResource extends Resource
         return $schema->components([
             Section::make('La actividad')->columns(2)->schema([
                 TextInput::make('titulo')->label('Título')->required()->maxLength(255)->columnSpanFull(),
+                TextInput::make('lugar')->label('Lugar')->required()->maxLength(120)->columnSpanFull()
+                    ->helperText('Dónde se hace: lo ven los participantes en la agenda y en sus reservas. Ej.: «Cancha de fútbol», «Salón grande».'),
                 Select::make('tipo')->label('Tipo')->options(TipoActividad::class)->required()->native(false)->default(TipoActividad::Taller)
                     ->live()->disabled($conRegistros)
                     // Al elegir «Estación JOTA» la modalidad pasa sola a «por equipo».
@@ -79,6 +81,7 @@ class ActividadResource extends Resource
             ->modifyQueryUsing(fn ($query) => $query->with('unidades:id,nombre')->withCount('turnos'))
             ->columns([
                 TextColumn::make('titulo')->label('Actividad')->searchable()->sortable()->wrap(),
+                TextColumn::make('lugar')->label('Lugar')->searchable()->placeholder('Sin lugar')->wrap(),
                 TextColumn::make('tipo')->label('Tipo')->badge(),
                 TextColumn::make('modalidad')->label('Modalidad')->badge(),
                 TextColumn::make('puntos')->label('Puntos')->numeric()->sortable(),

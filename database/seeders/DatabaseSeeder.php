@@ -78,9 +78,10 @@ class DatabaseSeeder extends Seeder
     /** Lanzamientos en el pasado y en el futuro, una vencida y una por patrulla. */
     private function misiones(Unidad $tropa, Unidad $caminantes, Unidad $rovers): void
     {
-        $crear = function (string $titulo, string $descripcion, Modalidad $modalidad, int $puntos, $lanza, $vence, array $unidades) {
+        $crear = function (string $titulo, string $lugar, string $descripcion, Modalidad $modalidad, int $puntos, $lanza, $vence, array $unidades) {
             $mision = Mision::create([
                 'titulo' => $titulo,
+                'lugar' => $lugar,
                 'descripcion' => $descripcion,
                 'modalidad' => $modalidad,
                 'puntos' => $puntos,
@@ -92,18 +93,18 @@ class DatabaseSeeder extends Seeder
 
         $todas = [$tropa, $caminantes, $rovers];
 
-        $crear('Bienvenida al JOTA-JOTI', 'Sacate una foto con tu uniforme y contanos de dónde venís.', Modalidad::Individual, 10, now()->subHours(2), null, $todas);
-        $crear('Nudos en equipo', 'Armen entre toda la patrulla un nudo de ocho y mandá la foto del equipo.', Modalidad::Patrulla, 50, now()->subHour(), now()->addHours(5), [$tropa, $caminantes]);
-        $crear('Bitácora Rover', 'Escribí una reflexión corta sobre tu servicio en este evento.', Modalidad::Individual, 40, now()->subMinutes(30), null, [$rovers]);
-        $crear('Mensaje en clave', 'Descifrá el mensaje secreto y mandá la respuesta.', Modalidad::Individual, 30, now()->addHours(3), null, $todas);
-        $crear('Desafío de la mañana', 'Esta misión ya venció: sirve para probar el caso de misión vencida.', Modalidad::Individual, 20, now()->subHours(5), now()->subHour(), $todas);
+        $crear('Bienvenida al JOTA-JOTI', 'Entrada principal', 'Sacate una foto con tu uniforme y contanos de dónde venís.', Modalidad::Individual, 10, now()->subHours(2), null, $todas);
+        $crear('Nudos en equipo', 'Campo de patrullas', 'Armen entre toda la patrulla un nudo de ocho y mandá la foto del equipo.', Modalidad::Patrulla, 50, now()->subHour(), now()->addHours(5), [$tropa, $caminantes]);
+        $crear('Bitácora Rover', 'Fogón Rover', 'Escribí una reflexión corta sobre tu servicio en este evento.', Modalidad::Individual, 40, now()->subMinutes(30), null, [$rovers]);
+        $crear('Mensaje en clave', 'Carpa de dirigentes', 'Descifrá el mensaje secreto y mandá la respuesta.', Modalidad::Individual, 30, now()->addHours(3), null, $todas);
+        $crear('Desafío de la mañana', 'Plaza central', 'Esta misión ya venció: sirve para probar el caso de misión vencida.', Modalidad::Individual, 20, now()->subHours(5), now()->subHour(), $todas);
     }
 
     /** Talleres (individuales o por equipo) y estaciones JOTA (siempre por equipo), con turnos y cupos. */
     private function actividades(Unidad $tropa, Unidad $caminantes, Unidad $rovers): void
     {
-        $crear = function (TipoActividad $tipo, string $titulo, Modalidad $modalidad, int $puntos, array $unidades, array $turnos) {
-            $actividad = Actividad::create(['tipo' => $tipo, 'titulo' => $titulo, 'modalidad' => $modalidad, 'puntos' => $puntos]);
+        $crear = function (TipoActividad $tipo, string $titulo, string $lugar, Modalidad $modalidad, int $puntos, array $unidades, array $turnos) {
+            $actividad = Actividad::create(['tipo' => $tipo, 'titulo' => $titulo, 'lugar' => $lugar, 'modalidad' => $modalidad, 'puntos' => $puntos]);
             $actividad->unidades()->attach(array_map(fn ($u) => $u->id, $unidades));
 
             foreach ($turnos as [$desde, $hasta, $cupo]) {
@@ -113,17 +114,17 @@ class DatabaseSeeder extends Seeder
 
         $todas = [$tropa, $caminantes, $rovers];
 
-        $crear(TipoActividad::Taller, 'Taller de primeros auxilios', Modalidad::Individual, 20, $todas, [
+        $crear(TipoActividad::Taller, 'Taller de primeros auxilios', 'Enfermería', Modalidad::Individual, 20, $todas, [
             ['+1 hour', '+2 hours', 10], ['+3 hours', '+4 hours', 8], ['+5 hours', '+6 hours', null],
         ]);
         // Estaciones JOTA: siempre por equipo (los Rovers, como unidad) y cada horario es de un solo equipo (cupo 1).
-        $crear(TipoActividad::EstacionJota, 'Estación JOTA: radioaficionados', Modalidad::Patrulla, 15, $todas, [
+        $crear(TipoActividad::EstacionJota, 'Estación JOTA: radioaficionados', 'Carpa de radio', Modalidad::Patrulla, 15, $todas, [
             ['+90 minutes', '+150 minutes', 1], ['+4 hours', '+5 hours', 1],
         ]);
-        $crear(TipoActividad::EstacionJota, 'Estación JOTA: gran juego de patrullas', Modalidad::Patrulla, 60, $todas, [
+        $crear(TipoActividad::EstacionJota, 'Estación JOTA: gran juego de patrullas', 'Cancha de fútbol', Modalidad::Patrulla, 60, $todas, [
             ['+2 hours', '+3 hours', 1], ['+4 hours', '+5 hours', 1],
         ]);
-        $crear(TipoActividad::Taller, 'Taller Rover: liderazgo', Modalidad::Individual, 25, [$rovers], [
+        $crear(TipoActividad::Taller, 'Taller Rover: liderazgo', 'Fogón Rover', Modalidad::Individual, 25, [$rovers], [
             ['+1 hour', '+3 hours', 6],
         ]);
     }

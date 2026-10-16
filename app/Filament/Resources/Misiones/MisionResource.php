@@ -53,6 +53,8 @@ class MisionResource extends Resource
         return $schema->components([
             Section::make('La misión')->schema([
                 TextInput::make('titulo')->label('Título')->required()->maxLength(255),
+                TextInput::make('lugar')->label('Lugar')->required()->maxLength(120)
+                    ->helperText('Dónde se hace o se entrega la misión: lo ven los participantes. Ej.: «Plaza central», «Carpa de dirigentes».'),
                 Textarea::make('descripcion')->label('Qué tienen que hacer')->required()->rows(4)->maxLength(5000),
             ]),
             Section::make('Cómo se juega')->columns(2)->schema([
@@ -81,6 +83,7 @@ class MisionResource extends Resource
                 ->withCount(['entregas', 'entregas as pendientes_count' => fn (Builder $q) => $q->pendientes()]))
             ->columns([
                 TextColumn::make('titulo')->label('Misión')->searchable()->sortable()->wrap(),
+                TextColumn::make('lugar')->label('Lugar')->searchable()->placeholder('Sin lugar')->wrap(),
                 TextColumn::make('estado')->label('Estado')->badge()
                     ->state(fn (Mision $record) => $record->estado())
                     ->formatStateUsing(fn (string $state) => ucfirst($state))

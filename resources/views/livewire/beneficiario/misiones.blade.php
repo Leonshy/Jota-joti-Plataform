@@ -8,7 +8,7 @@
             @foreach ($misiones as $m)
                 @php($tono = ['nueva' => 'marca', 'pendiente' => 'aviso', 'aprobada' => 'exito', 'rechazada' => 'error', 'vencida' => 'neutro', 'cerrada' => 'neutro'][$m['estado']])
                 <x-ui.fila :href="route('app.mision', $m['id'])" :icono="$m['por_patrulla'] ? 'user-group' : 'flag'" :titulo="$m['titulo']"
-                    :subtitulo="($m['por_patrulla'] ? __('jota.misiones.patrulla') : __('jota.misiones.individual')).' · '.cantidad($m['puntos'], 'punto')">
+                    :subtitulo="($m['por_patrulla'] ? __('jota.misiones.patrulla') : __('jota.misiones.individual')).' · '.cantidad($m['puntos'], 'punto').(filled($m['lugar'] ?? null) ? ' · '.$m['lugar'] : '')">
                     <x-slot:derecha><x-ui.insignia :tono="$tono">{{ __('jota.misiones.estados.'.$m['estado']) }}</x-ui.insignia></x-slot:derecha>
                 </x-ui.fila>
             @endforeach

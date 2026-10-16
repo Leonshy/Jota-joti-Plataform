@@ -20,7 +20,7 @@ class Actividad extends Model
 
     protected $table = 'actividades';
 
-    protected $fillable = ['tipo', 'titulo', 'modalidad', 'puntos'];
+    protected $fillable = ['tipo', 'titulo', 'lugar', 'modalidad', 'puntos'];
 
     protected function casts(): array
     {
@@ -83,6 +83,6 @@ class Actividad extends Model
     /** Auditoría de cambios de configuración: quién cambió qué y cuándo (§4.9). Nunca saldos. */
     public function getActivitylogOptions(): LogOptions
     {
-        return LogOptions::defaults()->useLogName('configuracion')->logOnly(['tipo', 'titulo', 'modalidad', 'puntos'])->logOnlyDirty()->dontSubmitEmptyLogs();
+        return LogOptions::defaults()->useLogName('configuracion')->logOnly(['tipo', 'titulo', 'lugar', 'modalidad', 'puntos'])->logOnlyDirty()->dontSubmitEmptyLogs();
     }
 }

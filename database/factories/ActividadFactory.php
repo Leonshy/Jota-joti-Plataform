@@ -15,6 +15,7 @@ class ActividadFactory extends Factory
         return [
             'tipo' => TipoActividad::Taller,
             'titulo' => fake()->sentence(3),
+            'lugar' => 'Salón grande',
             'modalidad' => Modalidad::Individual,
             'puntos' => 20,
         ];

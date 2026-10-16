@@ -25,6 +25,7 @@
 
     @foreach ($actividades as $a)
         <x-ui.seccion :titulo="$a['titulo']" wire:key="a-{{ $a['id'] }}">
+            <x-ui.lugar>{{ $a['lugar'] ?? '' }}</x-ui.lugar>
             <div class="flex flex-wrap gap-2">
                 <x-ui.insignia tono="marca">{{ $a['taller'] ? __('jota.actividades.taller') : __('jota.actividades.estacion') }}</x-ui.insignia>
                 <x-ui.insignia tono="neutro">{{ $a['por_equipo'] ? __('jota.actividades.equipo') : __('jota.actividades.individual') }}</x-ui.insignia>
