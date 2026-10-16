@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-15T00:00:00Z",
+  "title": "Design System: JOTA-JOTI 2026 Plataforma",
+  "extensions": {
+    "colorMeta": {
+      "violeta-marca": { "role": "primary", "displayName": "Violeta de marca", "canonical": "#622599", "tonalRamp": ["#261940", "#4d006e", "#4e1e7a", "#622599", "#8a5cc0", "#b79ad8", "#ebebff", "#f7f7ff"] },
+      "azul-enlace": { "role": "secondary", "displayName": "Azul de enlace", "canonical": "#00639a", "tonalRamp": ["#00395a", "#00639a", "#0079c0", "#3d9bd0", "#7fbce0", "#b3d8ee", "#d9ecf7", "#f0f8fc"] },
+      "cian-puntos": { "role": "tertiary", "displayName": "Cian de puntos", "canonical": "#82e6de", "tonalRamp": ["#0e5c56", "#1d8c84", "#43bdb4", "#82e6de", "#a5ede8", "#c4f3ef", "#d9f7f4", "#effcfb"] },
+      "rosa-jlis": { "role": "tertiary", "displayName": "Rosa de J-lis", "canonical": "#ff8dff", "tonalRamp": ["#7a2e7a", "#b04fb0", "#e068e0", "#ff8dff", "#ffaaff", "#ffc7ff", "#ffe9ff", "#fff6ff"] },
+      "ambar-aviso": { "role": "tertiary", "displayName": "Ambar de aviso", "canonical": "#f9b700", "tonalRamp": ["#3d2c00", "#7a5800", "#b88300", "#f9b700", "#fbcb47", "#fcdc85", "#fff4cc", "#fffaea"] },
+      "verde-exito": { "role": "semantic", "displayName": "Verde de éxito", "canonical": "#248737", "tonalRamp": ["#0f3a17", "#1d6e2d", "#248737", "#4da35c", "#80c08c", "#b3dbbb", "#e6f3ea", "#f4faf6"] },
+      "rojo-texto": { "role": "semantic", "displayName": "Rojo de error", "canonical": "#b3261e", "tonalRamp": ["#4a0f0b", "#7f1b15", "#b3261e", "#ff5655", "#ff8a89", "#ffb8b8", "#fdecec", "#fef6f6"] },
+      "tinta": { "role": "neutral", "displayName": "Tinta", "canonical": "#212529", "tonalRamp": ["#212529", "#5b636a", "#7b838a", "#adb5bd", "#dee2e6", "#e9ecef", "#f8f9fa", "#ffffff"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Saldos grandes (36 px bold, números tabulares)." },
+      "headline": { "displayName": "Headline", "purpose": "h1 de pantalla y de resultado, en violeta de marca." },
+      "title": { "displayName": "Title", "purpose": "Título de cabecera fija y texto de campo." },
+      "body": { "displayName": "Body", "purpose": "Todo el cuerpo, Poppins Medium 16 px." },
+      "label": { "displayName": "Label", "purpose": "Etiquetas de campo, insignias, pestañas de barra." }
+    },
+    "shadows": [
+      { "name": "tarjeta", "value": "0 1px 2px rgb(38 25 64 / 0.06), 0 4px 14px rgb(38 25 64 / 0.08)", "purpose": "Tarjeta blanca y saldo blanco." },
+      { "name": "elevada", "value": "0 2px 4px rgb(38 25 64 / 0.1), 0 10px 28px rgb(38 25 64 / 0.18)", "purpose": "Panel del QR, botón Escanear, columna en escritorio." }
+    ],
+    "motion": [
+      { "name": "ease-salida", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Salida exponencial para toda la interfaz." },
+      { "name": "ease-entrada-salida", "value": "cubic-bezier(0.65, 0, 0.35, 1)", "purpose": "Pulso de aviso." },
+      { "name": "duracion-rapida", "value": "150ms", "purpose": "Hover, presionado y foco." },
+      { "name": "duracion-base", "value": "220ms", "purpose": "Cambios de estado de interfaz." },
+      { "name": "duracion-momento", "value": "420ms", "purpose": "Sello de pago confirmado." },
+      { "name": "sello-onda-trazo", "value": "sello 420ms + onda 600ms + trazo-check 320ms (delay 100ms)", "purpose": "Momento 1: pago confirmado." },
+      { "name": "conteo", "value": "count-up en saldo (data-contar)", "purpose": "Momento 2: puntos y J-lis acreditados." },
+      { "name": "qr-rota", "value": "qr-entra 280ms / qr-sale 160ms / qr-cuenta 60s linear", "purpose": "Momento 3: QR que rota con barra de cuenta regresiva." },
+      { "name": "reduced-motion", "value": "fundido 160ms; sin escala, desplazamiento ni desenfoque", "purpose": "prefers-reduced-motion; la barra de cuenta se conserva." }
+    ],
+    "breakpoints": [
+      { "name": "columna-movil", "value": "448px (max-w-md), diseñada a 360px" },
+      { "name": "md", "value": "768px (sombra de columna y fondo lavanda alrededor)" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Acción principal: píldora violeta de 56 px.",
+      "html": "<button class=\"ds-btn-primary\">Entregar</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 56px; width: 100%; padding: 0 24px; border: 0; border-radius: 9999px; background: var(--color-primario, #622599); color: #fff; font: 700 16px/1.55 Poppins, system-ui, sans-serif; transition: background 150ms cubic-bezier(0.16,1,0.3,1), transform 150ms; } .ds-btn-primary:hover { background: var(--color-primario-fuerte, #4e1e7a); } .ds-btn-primary:active { transform: scale(0.98); } .ds-btn-primary:focus-visible { outline: 3px solid #0079c0; outline-offset: 3px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Acción alternativa: píldora blanca con anillo violeta.",
+      "html": "<button class=\"ds-btn-secondary\">Cancelar</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; min-height: 56px; width: 100%; padding: 0 24px; border: 0; border-radius: 9999px; background: #fff; color: #622599; box-shadow: inset 0 0 0 2px #622599; font: 700 16px/1.55 Poppins, system-ui, sans-serif; transition: background 150ms; } .ds-btn-secondary:hover { background: #ebebff; } .ds-btn-secondary:focus-visible { outline: 3px solid #0079c0; outline-offset: 3px; }"
+    },
+    {
+      "name": "Saldo de puntos",
+      "kind": "card",
+      "refersTo": "card-puntos",
+      "description": "Bloque cian de puntos con número grande en violeta tinta.",
+      "html": "<div class=\"ds-saldo\"><p class=\"ds-saldo-et\">Puntos</p><p class=\"ds-saldo-num\">1.250</p></div>",
+      "css": ".ds-saldo { border-radius: 16px; padding: 16px; background: #82e6de; color: #261940; font-family: Poppins, system-ui, sans-serif; } .ds-saldo-et { margin: 0; font-weight: 500; font-size: 15px; } .ds-saldo-num { margin: 4px 0 0; font-weight: 700; font-size: 36px; line-height: 1.1; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Tarjeta base",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Tarjeta blanca de 16 px con sombra suave.",
+      "html": "<div class=\"ds-card\">Contenido</div>",
+      "css": ".ds-card { border-radius: 16px; padding: 16px; background: #fff; color: #212529; font: 500 16px/1.55 Poppins, system-ui, sans-serif; box-shadow: 0 1px 2px rgb(38 25 64 / 0.06), 0 4px 14px rgb(38 25 64 / 0.08); }"
+    },
+    {
+      "name": "Campo de texto",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "Campo de 56 px con borde de 2 px y radio de 8 px.",
+      "html": "<label class=\"ds-label\" for=\"ds-i\">Tu nombre</label><input id=\"ds-i\" class=\"ds-input\" type=\"text\">",
+      "css": ".ds-label { display: block; margin-bottom: 6px; font: 700 15px/1.45 Poppins, system-ui, sans-serif; color: #212529; } .ds-input { display: block; width: 100%; box-sizing: border-box; min-height: 56px; padding: 0 16px; border: 2px solid #7b838a; border-radius: 8px; background: #fff; color: #212529; font: 500 18px Poppins, system-ui, sans-serif; transition: border-color 150ms; } .ds-input:focus { border-color: #622599; } .ds-input:focus-visible { outline: 3px solid #0079c0; outline-offset: 3px; }"
+    },
+    {
+      "name": "Insignia de estado",
+      "kind": "chip",
+      "refersTo": "badge-success",
+      "description": "Píldora de estado; éxito, aviso y error llevan ícono además del color.",
+      "html": "<span class=\"ds-badge\"><svg viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M8 1a7 7 0 100 14A7 7 0 008 1zm3.2 5.4l-3.6 4a.6.6 0 01-.9 0L4.8 8.5a.6.6 0 11.9-.8l1.4 1.5 3.2-3.5a.6.6 0 11.9.7z\"/></svg>Aprobada</span>",
+      "css": ".ds-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px; border-radius: 9999px; background: #e6f3ea; color: #1d6e2d; font: 700 14px/1.35 Poppins, system-ui, sans-serif; white-space: nowrap; }"
+    },
+    {
+      "name": "Barra inferior del participante",
+      "kind": "nav",
+      "refersTo": "nav-scan-center",
+      "description": "Cinco pestañas con Escanear como círculo violeta elevado al centro.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-tab ds-on\" href=\"#\">Inicio</a><a class=\"ds-tab\" href=\"#\">Misiones</a><a class=\"ds-scan\" href=\"#\" aria-label=\"Escanear\"><svg viewBox=\"0 0 24 24\" width=\"28\" height=\"28\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" aria-hidden=\"true\"><path d=\"M3.75 4.5h6v6h-6zM13.5 4.5h6v6h-6zM3.75 13.5h6v6h-6zM13.5 13.5h2.25v2.25H13.5zM17.25 17.25h2.25v2.25h-2.25z\"/></svg></a><a class=\"ds-tab\" href=\"#\">Actividades</a><a class=\"ds-tab\" href=\"#\">Ranking</a></nav>",
+      "css": ".ds-nav { display: flex; align-items: flex-end; justify-content: space-around; padding: 6px 4px 0; border-top: 1px solid #dee2e6; background: #fff; font-family: Poppins, system-ui, sans-serif; } .ds-tab { flex: 1; min-height: 56px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px; font-weight: 700; font-size: 14px; color: #5b636a; text-decoration: none; border-radius: 16px; } .ds-on { color: #622599; background: #ebebff; } .ds-scan { flex: 1.3; display: grid; place-items: center; width: 56px; height: 56px; margin: -28px 0 6px; max-width: 56px; border-radius: 9999px; background: #622599; color: #fff; box-shadow: 0 2px 4px rgb(38 25 64 / 0.1), 0 10px 28px rgb(38 25 64 / 0.18), 0 0 0 4px #fff; } .ds-tab:focus-visible, .ds-scan:focus-visible { outline: 3px solid #0079c0; outline-offset: 3px; }"
+    },
+    {
+      "name": "Sello de éxito",
+      "kind": "custom",
+      "refersTo": "badge-success",
+      "description": "Disco verde con aro cian y tilde; momento de pago confirmado.",
+      "html": "<div class=\"ds-sello\"><svg viewBox=\"0 0 24 24\" width=\"48\" height=\"48\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12.5l4.5 4.5L19 7.5\"/></svg></div>",
+      "css": ".ds-sello { display: grid; place-items: center; width: 96px; height: 96px; border-radius: 9999px; background: #248737; color: #fff; box-shadow: 0 0 0 8px #82e6de; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "El pañuelo del evento",
+    "overview": "La app habla el idioma visual de jotajoti.info (decisión fijada por el usuario, no una dirección sorteada): fondo claro y limpio, violeta scout como único color de acción, botones en píldora, Poppins gruesa. Es una herramienta de tarea para chicos de 11 a 21 años con el celular al sol, así que la alegría viene del color y la forma, no de decoración: un acento, bloques saturados solo cuando hay recompensa, y movimiento solo en tres momentos.\n\nDensidad de modo Operate: una columna de 448 px como máximo (max-w-md), centrada en pantallas grandes, cuerpo de 16 px, objetivos táctiles de 48 a 56 px. Los títulos de pantalla van en violeta de marca, y las frases grises llevan énfasis en violeta. Rechaza el tablero genérico de gamificación: tarjetas idénticas con ícono y números enormes sin contexto.",
+    "keyCharacteristics": [
+      "Un solo acento de acción (violeta #622599); azul solo para enlaces y foco.",
+      "Cian = puntos, rosa = J-lis: los dos bloques saturados son las monedas del juego.",
+      "Poppins Medium 500 en cuerpo, Poppins Bold 700 en títulos, botones y etiquetas. No existe otro peso.",
+      "Píldoras para acciones y estados; 16 px de radio para tarjetas; 8 px para campos.",
+      "Profundidad con sombras suaves violeta-tinta; nada de halos ni sombras duras.",
+      "Todo sale de tokens de resources/css/app.css; los componentes no llevan colores ni fuentes literales."
+    ],
+    "rules": [
+      { "name": "The One Action Colour Rule", "body": "El violeta es el único color de acción. Azul es solo enlace y foco; nunca un segundo botón.", "section": "colors" },
+      { "name": "The Currency Colour Rule", "body": "Los bloques saturados cian (puntos) y rosa (J-lis) son colores de moneda. No se usan para decorar ni para otros datos.", "section": "colors" },
+      { "name": "The Darkened Text Rule", "body": "El texto de estado usa las variantes oscuras (#b3261e, #7a5800, #1d6e2d, #5b636a) para AA. Los tonos claros son fondos, discos e íconos grandes, no texto pequeño.", "section": "colors" },
+      { "name": "The Not-Only-Colour Rule", "body": "Éxito, aviso y error llevan ícono además de texto y color.", "section": "colors" },
+      { "name": "The Two Weights Rule", "body": "Solo existen 500 y 700. No usar font-normal ni font-semibold.", "section": "typography" },
+      { "name": "The Title Colour Rule", "body": "h1 en violeta de marca; h2 a h4 en el color de texto. Los títulos usan text-wrap: balance.", "section": "typography" },
+      { "name": "The Tabular Numbers Rule", "body": "Saldos, puntajes y horas llevan numeros (tabular-nums) para alinear columnas.", "section": "typography" },
+      { "name": "The Fixed Scale Rule", "body": "Escala fija en rem, sin tamaños fluidos: es una app de tarea, no una página de marca.", "section": "typography" },
+      { "name": "The Soft Shadow Rule", "body": "Las sombras son violeta-tinta, difusas y de dos capas. Sin halos de color y sin sombras duras sin desenfoque.", "section": "elevation" },
+      { "name": "The Tone Before Shadow Rule", "body": "Las tarjetas de color (cian, rosa, estados) van planas; la sombra es de las tarjetas blancas.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do sacar todo color, tamaño y fuente de los tokens de app.css; sin hex ni familias literales en componentes.",
+      "Do usar el violeta (#622599) como única acción primaria, en píldora de 56 px.",
+      "Do reservar cian para puntos y rosa para J-lis, con texto violeta tinta (#261940) encima.",
+      "Do dar a cada objetivo táctil al menos 48 px y al cuerpo 16 px.",
+      "Do acompañar éxito, aviso y error con ícono y texto, y usar las variantes oscurecidas para texto de estado.",
+      "Do poner foco visible (anillo azul de 3 px con 3 px de separación) y un único h1 por pantalla.",
+      "Do formatear cantidades con el helper cantidad() y alinear números con numeros.",
+      "Do mantener el QR negro sobre blanco, y animar solo los tres momentos con nombre."
+    ],
+    "donts": [
+      "Don't usar pesos distintos de 500 y 700.",
+      "Don't usar azul, cian o rosa como segundo color de acción o decoración.",
+      "Don't repetir tarjetas idénticas con ícono y número enorme sin contexto (el tablero genérico de gamificación).",
+      "Don't usar sombras duras sin desenfoque, halos de color ni sombras sobre tarjetas de color.",
+      "Don't usar texto pequeño en #ff5655, #f9b700 o #248737; no pasan como texto.",
+      "Don't animar con desplazamiento, escala o desenfoque sin cubrir el caso de movimiento reducido.",
+      "Don't usar íconos de glifo o emoji: solo Heroicons de trazo."
+    ]
+  }
+}

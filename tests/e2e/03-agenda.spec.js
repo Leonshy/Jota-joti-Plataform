@@ -1,0 +1,109 @@
+import { expect, test } from '@playwright/test';
+import { sesionDe } from './apoyo.mjs';
+
+test.describe('Agenda y reservas', () => {
+    test('reservar, ver en «Mis reservas» y cancelar con confirmación', async ({ browser }) => {
+        const { page } = await sesionDe(browser, '4000013');
+
+        await page.goto('/app/actividades');
+        const taller = page.getByRole('region', { name: 'Taller de primeros auxilios' });
+        await taller.getByRole('button', { name: /^Reservar/ }).first().click();
+        await expect(page.getByText(/¡Reservado!/)).toBeVisible();
+        await expect(taller.getByText('Reservado').first()).toBeVisible();
+
+        await page.getByRole('link', { name: 'Mis reservas' }).click();
+        await expect(page.getByText('Taller de primeros auxilios')).toBeVisible();
+
+        await page.getByRole('button', { name: 'Cancelar reserva' }).click();
+        await expect(page.getByText('¿Cancelar la reserva?')).toBeVisible();
+        await page.getByRole('button', { name: 'No, la dejo' }).click();
+        await expect(page.getByText('Taller de primeros auxilios')).toBeVisible();
+
+        await page.getByRole('button', { name: 'Cancelar reserva' }).click();
+        await page.getByRole('button', { name: 'Sí, cancelar' }).click();
+        await expect(page.getByText('No tenés reservas.')).toBeVisible();
+    });
+
+    test('un turno que se pisa con otro reservado avisa del choque', async ({ browser }) => {
+        const { page } = await sesionDe(browser, '4000014');
+
+        await page.goto('/app/actividades');
+        // Turno 04:14 del taller y turno 04:44 de la estación se pisan (el primero dura una hora).
+        await page.getByRole('region', { name: 'Taller de primeros auxilios' }).getByRole('button', { name: /^Reservar/ }).first().click();
+        await expect(page.getByText(/¡Reservado!/)).toBeVisible();
+
+        await page.getByRole('region', { name: 'Estación JOTA: radioaficionados' }).getByRole('button', { name: /^Reservar/ }).first().click();
+        await expect(page.getByText(/Choca con tu reserva/)).toBeVisible();
+    });
+
+    test('en la estación cada horario es de un solo equipo: el otro equipo lo ve ocupado', async ({ browser }) => {
+        const estacion = (page, nombre) => page.getByRole('region', { name: nombre });
+        const { page: aguilas } = await sesionDe(browser, '4000001');
+        const { page: pumas } = await sesionDe(browser, '4000005');
+
+        await aguilas.goto('/app/actividades');
+        await estacion(aguilas, 'Estación JOTA: gran juego de patrullas').getByRole('listitem').first().getByRole('button', { name: /^Reservar/ }).click();
+        await expect(aguilas.getByText(/¡Reservado!/)).toBeVisible();
+
+        await pumas.goto('/app/actividades');
+        const horario = estacion(pumas, 'Estación JOTA: gran juego de patrullas').getByRole('listitem').first();
+        await expect(horario.getByText(/Ocupado por otro equipo/)).toBeVisible();
+        await expect(horario.getByRole('button', { name: /^Reservar/ })).toBeDisabled();
+    });
+
+    test('un equipo reserva una sola estación a la vez, a cualquier hora, hasta que termine', async ({ browser }) => {
+        const { page: compa } = await sesionDe(browser, '4000002'); // misma patrulla (Águilas) que reservó el gran juego
+        await compa.goto('/app/actividades');
+
+        // El equipo ya tiene reservada una estación: ninguna otra se puede reservar, ni a otra hora.
+        await expect(compa.getByText(/Tu equipo ya tiene reservada «Estación JOTA: gran juego de patrullas»/).first()).toBeVisible();
+        const radio = compa.getByRole('region', { name: 'Estación JOTA: radioaficionados' });
+        for (const boton of await radio.getByRole('button', { name: /^Reservar/ }).all()) await expect(boton).toBeDisabled();
+
+        // Los talleres no cuentan: siguen disponibles.
+        await expect(compa.getByRole('region', { name: 'Taller de primeros auxilios' }).getByRole('button', { name: /^Reservar/ }).first()).toBeEnabled();
+    });
+
+    test('los Rovers reservan la estación como una sola unidad', async ({ browser }) => {
+        const { page: uno } = await sesionDe(browser, '4000043');
+        const { page: otro } = await sesionDe(browser, '4000044');
+
+        await uno.goto('/app/actividades');
+        await expect(uno.getByText(/Reservás para todo tu equipo \(Rovers\)/).first()).toBeVisible();
+        await uno.getByRole('region', { name: 'Estación JOTA: radioaficionados' }).getByRole('button', { name: /^Reservar/ }).first().click();
+        await expect(uno.getByText(/¡Reservado!/)).toBeVisible();
+
+        // Otro Rover ve la estación reservada por su unidad y no puede reservar otra.
+        await otro.goto('/app/actividades');
+        await expect(otro.getByText(/Tu equipo ya tiene reservada «Estación JOTA: radioaficionados»/).first()).toBeVisible();
+        await otro.goto('/app/actividades/reservas');
+        await expect(otro.getByText('Estación JOTA: radioaficionados')).toBeVisible();
+        await expect(otro.getByText('Para tu equipo')).toBeVisible();
+    });
+
+    test('el dirigente ve y cancela la reserva de otra persona', async ({ browser }) => {
+        const { page: ana } = await sesionDe(browser, '4000025'); // Caminantes: su dirigente es otro
+        const { page: pedro } = await sesionDe(browser, '4000003');
+        const { page: dir } = await sesionDe(browser, '4000045');
+
+        await pedro.goto('/app/actividades');
+        await pedro.getByRole('region', { name: 'Taller de primeros auxilios' }).getByRole('button', { name: /^Reservar/ }).nth(2).click();
+        await expect(pedro.getByText(/¡Reservado!/)).toBeVisible();
+
+        await dir.goto('/dirigente/reservas');
+        await expect(dir.getByText('Águilas 3')).toBeVisible();
+        await dir.getByRole('button', { name: /Cancelar reserva: Águilas 3/ }).click();
+        await dir.getByRole('button', { name: 'Sí, cancelar' }).click();
+        await expect(dir.getByText('Águilas 3')).toHaveCount(0);
+
+        await pedro.goto('/app/actividades/reservas');
+        await expect(pedro.getByText('Taller de primeros auxilios')).toHaveCount(0);
+
+        // La reserva de otra unidad no aparece en la lista de este dirigente.
+        await ana.goto('/app/actividades');
+        await ana.getByRole('region', { name: 'Taller de primeros auxilios' }).getByRole('button', { name: /^Reservar/ }).first().click();
+        await expect(ana.getByText(/¡Reservado!/)).toBeVisible();
+        await dir.goto('/dirigente/reservas');
+        await expect(dir.getByText('Yaguaretés 3')).toHaveCount(0);
+    });
+});

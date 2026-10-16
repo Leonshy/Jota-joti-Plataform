@@ -1,0 +1,357 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+/*
+ * Sistema de diseño JOTA-JOTI 2026.
+ * Estilo visual de jotajoti.info (ver docs/design/identidad-visual.md). Regla del proyecto: ningún
+ * componente usa colores ni tipografías literales; todo sale de los tokens de este archivo.
+ */
+
+/* ── Poppins autohospedada: solo Medium (500, cuerpo) y Bold (700, títulos y botones) ── */
+@font-face {
+    font-family: 'Poppins';
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+    src: url('../fonts/poppins-medium.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Poppins';
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+    src: url('../fonts/poppins-bold.woff2') format('woff2');
+}
+
+@theme {
+    /* Tipografía. Solo existen los pesos 500 y 700: no usar font-normal ni font-semibold. */
+    --font-sans: 'Poppins', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+    /* Escala fija en rem (app de tarea, no página de marca). Cuerpo 16 px; apoyo 14 px. */
+    --text-xs: 0.875rem;
+    --text-xs--line-height: 1.35;
+    --text-sm: 0.9375rem;
+    --text-sm--line-height: 1.45;
+    --text-base: 1rem;
+    --text-base--line-height: 1.55;
+    --text-lg: 1.125rem;
+    --text-lg--line-height: 1.45;
+    --text-xl: 1.375rem;
+    --text-xl--line-height: 1.3;
+    --text-2xl: 1.75rem;
+    --text-2xl--line-height: 1.2;
+    --text-3xl: 2.25rem;
+    --text-3xl--line-height: 1.1;
+    --text-4xl: 3rem;
+    --text-4xl--line-height: 1;
+
+    /* Marca (valores medidos en jotajoti.info). */
+    --color-violeta-50: #f7f7ff;
+    --color-violeta-100: #ebebff;
+    --color-violeta-600: #622599;
+    --color-violeta-700: #4e1e7a;
+    --color-violeta-800: #4d006e;
+    --color-violeta-900: #261940;
+    --color-azul-600: #0079c0;
+    --color-azul-700: #00639a;
+    --color-azul-900: #00395a;
+    --color-cian-100: #d9f7f4;
+    --color-cian-300: #82e6de;
+    --color-rosa-100: #ffe9ff;
+    --color-rosa-300: #ff8dff;
+    --color-amarillo-100: #fff4cc;
+    --color-amarillo-400: #f9b700;
+    --color-amarillo-800: #7a5800;
+    --color-verde-100: #e6f3ea;
+    --color-verde-600: #248737;
+    --color-verde-800: #1d6e2d;
+    --color-rojo-100: #fdecec;
+    --color-rojo-400: #ff5655;
+    --color-rojo-700: #b3261e;
+    --color-naranja-500: #ef5000;
+
+    /* Neutros. El gris de apoyo se oscureció (#5b636a) para que lea bien también sobre lavanda. */
+    --color-gris-50: #f8f9fa;
+    --color-gris-100: #e9ecef;
+    --color-gris-200: #dee2e6;
+    --color-gris-400: #7b838a;
+    --color-gris-600: #5b636a;
+    --color-gris-900: #212529;
+
+    /* Roles semánticos: lo que usan los componentes. */
+    --color-fondo: #ffffff;
+    --color-fondo-suave: var(--color-violeta-50);
+    --color-superficie: #ffffff;
+    --color-texto: var(--color-gris-900);
+    --color-texto-suave: var(--color-gris-600);
+    --color-titulo: var(--color-violeta-600);
+    --color-primario: var(--color-violeta-600);
+    --color-primario-fuerte: var(--color-violeta-700);
+    --color-primario-suave: var(--color-violeta-100);
+    --color-sobre-primario: #ffffff;
+    --color-enlace: var(--color-azul-700);
+    --color-borde: var(--color-gris-200);
+    --color-borde-campo: var(--color-gris-400);
+    --color-exito: var(--color-verde-600);
+    --color-exito-texto: var(--color-verde-800);
+    --color-exito-fondo: var(--color-verde-100);
+    --color-aviso: var(--color-amarillo-400);
+    --color-aviso-texto: var(--color-amarillo-800);
+    --color-aviso-fondo: var(--color-amarillo-100);
+    --color-error: var(--color-rojo-400);
+    --color-error-texto: var(--color-rojo-700);
+    --color-error-fondo: var(--color-rojo-100);
+    --color-info: var(--color-cian-300);
+    --color-info-fondo: var(--color-cian-100);
+    --color-recompensa: var(--color-rosa-300);
+    --color-recompensa-fondo: var(--color-rosa-100);
+
+    /* Formas: radio 8 / 16 / 24 y píldora (como los botones del sitio oficial). */
+    --radius-sm: 0.5rem;
+    --radius-md: 1rem;
+    --radius-lg: 1.5rem;
+
+    /* Profundidad con desplazamiento y desenfoque (sin halos ni sombras duras). */
+    --shadow-tarjeta: 0 1px 2px rgb(38 25 64 / 0.06), 0 4px 14px rgb(38 25 64 / 0.08);
+    --shadow-elevada: 0 2px 4px rgb(38 25 64 / 0.1), 0 10px 28px rgb(38 25 64 / 0.18);
+
+    /* Tamaños táctiles. */
+    --spacing-tactil: 3rem;
+    --spacing-boton: 3.5rem;
+
+    /* Movimiento: salida exponencial; rápido para la interfaz, largo solo para los 3 momentos clave. */
+    --ease-salida: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-entrada-salida: cubic-bezier(0.65, 0, 0.35, 1);
+    --duracion-rapida: 150ms;
+    --duracion-base: 220ms;
+    --duracion-momento: 420ms;
+
+    --animate-sello: sello var(--duracion-momento) var(--ease-salida) both;
+    --animate-sube: sube 320ms var(--ease-salida) both;
+    --animate-onda: onda 600ms var(--ease-salida) both;
+    --animate-giro: spin 700ms linear infinite;
+    --animate-qr-entra: qr-entra 280ms var(--ease-salida) both;
+    --animate-qr-sale: qr-sale 160ms ease-in both;
+}
+
+/* ── Base ───────────────────────────────────────────────────────────────────────────── */
+@layer base {
+    html {
+        -webkit-text-size-adjust: 100%;
+        -webkit-tap-highlight-color: transparent;
+        accent-color: var(--color-primario);
+        scroll-padding-bottom: 6rem;
+    }
+
+    body {
+        background-color: var(--color-fondo);
+        color: var(--color-texto);
+        font-family: var(--font-sans);
+        font-weight: 500;
+        font-size: var(--text-base);
+        line-height: var(--text-base--line-height);
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        overscroll-behavior-y: none;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+        font-weight: 700;
+        text-wrap: balance;
+        color: var(--color-texto);
+    }
+
+    /* Regla de color de títulos: h1 en violeta de marca (como el sitio oficial); h2 a h4 en el color de texto. */
+    h1 {
+        color: var(--color-titulo);
+    }
+
+    p {
+        text-wrap: pretty;
+    }
+
+    a {
+        color: var(--color-enlace);
+        text-underline-offset: 0.2em;
+    }
+
+    /* Foco visible y consistente (teclado, lector de pantalla, botones físicos). */
+    :focus-visible {
+        outline: 3px solid var(--color-azul-600);
+        outline-offset: 3px;
+        border-radius: var(--radius-sm);
+    }
+
+    /* Superficies del navegador que no son nuestras pero también llevan la marca. */
+    ::selection {
+        background-color: var(--color-cian-300);
+        color: var(--color-gris-900);
+    }
+
+    input,
+    textarea,
+    select {
+        caret-color: var(--color-primario);
+        font-family: inherit;
+    }
+
+    ::placeholder {
+        color: var(--color-gris-600);
+        opacity: 1;
+    }
+
+    * {
+        scrollbar-color: var(--color-gris-400) transparent;
+    }
+
+    /* Los números de saldos, puntajes y horas se alinean en columna. */
+    .numeros,
+    [data-numeros] {
+        font-variant-numeric: tabular-nums;
+    }
+
+    [hidden] {
+        display: none !important;
+    }
+}
+
+/* ── Movimiento: tres momentos con nombre (pago confirmado, puntos acreditados, QR que rota) ── */
+@keyframes sello {
+    0% {
+        opacity: 0;
+        transform: scale(0.85);
+    }
+
+    60% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes sube {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes onda {
+    from {
+        opacity: 0.55;
+        transform: scale(0.7);
+    }
+
+    to {
+        opacity: 0;
+        transform: scale(1.9);
+    }
+}
+
+@keyframes trazo {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes qr-cuenta {
+    from {
+        /* Arranca proporcional a lo que queda de la ventana de 60 s (en el primer ciclo suele ser menos). */
+        transform: scaleX(var(--inicio, 1));
+    }
+
+    to {
+        transform: scaleX(0);
+    }
+}
+
+@keyframes qr-entra {
+    from {
+        opacity: 0;
+        transform: scale(1.03);
+        filter: blur(3px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+        filter: blur(0);
+    }
+}
+
+@keyframes qr-sale {
+    to {
+        opacity: 0;
+        transform: scale(0.98);
+        filter: blur(3px);
+    }
+}
+
+@keyframes pulso-aviso {
+    50% {
+        opacity: 0.55;
+    }
+}
+
+@utility trazo-check {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: trazo 320ms var(--ease-salida) 100ms forwards;
+}
+
+@utility pulso-aviso {
+    animation: pulso-aviso 1s var(--ease-entrada-salida) infinite;
+}
+
+@keyframes fundido {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/*
+ * Quien pide menos movimiento recibe los mismos cambios de estado con un fundido corto y sin desplazamientos,
+ * escalas, desenfoques ni destellos. La barra de cuenta regresiva queda: es información, no adorno.
+ */
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    .animate-sello,
+    .animate-sube,
+    .animate-qr-entra {
+        animation: fundido 160ms ease-out both;
+    }
+
+    .animate-onda,
+    .animate-qr-sale,
+    .pulso-aviso {
+        animation: none;
+    }
+
+    .trazo-check {
+        animation: none;
+        stroke-dashoffset: 0;
+    }
+}
