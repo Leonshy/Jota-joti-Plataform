@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
@@ -20,6 +21,13 @@ class AppServiceProvider extends ServiceProvider
         // En producción todo se genera con https (QR, enlaces firmados, redirecciones), aunque el proxy hable http.
         if ($this->app->isProduction()) {
             URL::forceScheme('https');
+        }
+
+        // Detrás del proxy de Plesk (nginx): se confía en él para saber si la conexión original era HTTPS. Se fija acá, con
+        // config(), y no en bootstrap/app.php con env(): con `config:cache` el .env ya no se lee.
+        $proxies = config('jota.trusted_proxies');
+        if (filled($proxies)) {
+            TrustProxies::at($proxies === '*' ? '*' : array_map('trim', explode(',', (string) $proxies)));
         }
 
         $this->limitadores();

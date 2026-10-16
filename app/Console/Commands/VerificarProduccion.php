@@ -66,8 +66,10 @@ class VerificarProduccion extends Command
         $this->chequeo('APP_DEBUG está apagado', config('app.debug') === false, 'APP_DEBUG=true muestra datos internos ante un error');
         $this->chequeo('APP_KEY definida', filled(config('app.key')), 'falta correr php artisan key:generate');
         $this->chequeo('APP_URL usa https y no es localhost', str_starts_with($url, 'https://') && ! str_contains($url, 'localhost'), "vale «{$url}»: los QR y los enlaces firmados salen con esa dirección");
-        $this->chequeo('El nivel de registro no es «debug»', config('logging.channels.'.config('logging.default').'.level', 'debug') !== 'debug', 'LOG_LEVEL=debug llena el disco y guarda de más', critico: false);
-        $this->chequeo('Hay proxies de confianza configurados (TRUSTED_PROXIES)', filled(env('TRUSTED_PROXIES')), 'sin eso Laravel no sabe que la conexión original era https', critico: false);
+        $canales = config('logging.default') === 'stack' ? (array) config('logging.channels.stack.channels') : [config('logging.default')];
+        $enDebug = collect($canales)->contains(fn ($c) => config("logging.channels.{$c}.level", 'debug') === 'debug');
+        $this->chequeo('El nivel de registro no es «debug»', ! $enDebug, 'LOG_LEVEL=debug llena el disco y guarda de más', critico: false);
+        $this->chequeo('Hay proxies de confianza configurados (TRUSTED_PROXIES)', filled(config('jota.trusted_proxies')), 'sin eso Laravel no sabe que la conexión original era https', critico: false);
         $this->chequeo('La cola no es «sync»', config('queue.default') !== 'sync', 'las fotos se procesarían dentro de la petición');
         $this->chequeo('La caché no es «array»', config('cache.default') !== 'array', 'se perdería en cada petición (el ranking y los límites dependen de ella)');
         $this->chequeo('El respaldo tiene contraseña (BACKUP_ARCHIVE_PASSWORD)', filled(config('backup.backup.password')), 'los respaldos de la base llevan datos de menores: tienen que ir cifrados');

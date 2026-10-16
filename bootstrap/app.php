@@ -28,15 +28,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prependToPriorityList(before: SubstituteBindings::class, prepend: EnsureRol::class);
 
         // En producción solo se atiende el dominio oficial: un encabezado Host falso no puede fabricar enlaces ni QR.
-        if (env('APP_ENV') === 'production') {
-            $middleware->trustHosts(at: fn () => array_filter([
-                parse_url((string) config('app.url'), PHP_URL_HOST),
-                ...array_map('trim', explode(',', (string) env('TRUSTED_HOSTS', ''))),
-            ]), subdomains: false);
-        }
-
-        // Detrás del proxy de Plesk (nginx): se confía en él para saber si la conexión original era HTTPS.
-        $middleware->trustProxies(at: env('TRUSTED_PROXIES') === '*' ? '*' : (env('TRUSTED_PROXIES') ? array_map('trim', explode(',', env('TRUSTED_PROXIES'))) : null));
+        // Todo se lee de config() y dentro del closure: con `config:cache` el .env ya no se lee y env() daría null.
+        $middleware->trustHosts(at: fn () => app()->isProduction() ? array_filter([
+            parse_url((string) config('app.url'), PHP_URL_HOST),
+            ...array_map('trim', explode(',', (string) config('jota.trusted_hosts'))),
+        ]) : [], subdomains: false);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
