@@ -53,8 +53,8 @@ class MisionResource extends Resource
         return $schema->components([
             Section::make('La misión')->schema([
                 TextInput::make('titulo')->label('Título')->required()->maxLength(255),
-                TextInput::make('lugar')->label('Lugar')->required()->maxLength(120)
-                    ->helperText('Dónde se hace o se entrega la misión: lo ven los participantes. Ej.: «Plaza central», «Carpa de dirigentes».'),
+                TextInput::make('lugar')->label('Lugar (opcional)')->maxLength(120)
+                    ->helperText('Dónde se hace o se entrega la misión, si tiene un lugar. Dejalo vacío si se puede hacer desde cualquier lado. Ej.: «Plaza central», «Carpa de dirigentes».'),
                 Textarea::make('descripcion')->label('Qué tienen que hacer')->required()->rows(4)->maxLength(5000),
             ]),
             Section::make('Cómo se juega')->columns(2)->schema([

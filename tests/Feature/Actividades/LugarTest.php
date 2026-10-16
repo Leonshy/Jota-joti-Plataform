@@ -5,6 +5,7 @@ use App\Domain\Misiones\MisionesDelParticipante;
 use App\Enums\Modalidad;
 use App\Filament\Resources\Actividades\Pages\CreateActividad;
 use App\Filament\Resources\Misiones\Pages\CreateMision;
+use App\Models\Mision;
 use App\Models\Reserva;
 use Filament\Facades\Filament;
 use Livewire\Livewire;
@@ -48,7 +49,7 @@ it('lo ya cargado sin lugar sigue funcionando y no muestra un lugar vacío', fun
     $this->actingAs($this->yo)->get(route('app.misiones'))->assertOk()->assertSee('Misión sin lugar');
 });
 
-it('el panel pide el lugar al crear una actividad y una misión', function () {
+it('el panel pide el lugar al crear una actividad, pero en una misión es opcional', function () {
     Filament::setCurrentPanel('admin');
     $this->actingAs(adminDePrueba());
 
@@ -61,5 +62,7 @@ it('el panel pide el lugar al crear una actividad y una misión', function () {
             'titulo' => 'Misión', 'descripcion' => 'Hacer algo.', 'modalidad' => Modalidad::Individual->value, 'puntos' => 10,
             'unidades' => [$this->e->unidad->id], 'lanza_at' => now()->addHour(),
         ])
-        ->call('create')->assertHasFormErrors(['lugar' => 'required']);
+        ->call('create')->assertHasNoFormErrors();
+
+    expect(Mision::where('titulo', 'Misión')->sole()->lugar)->toBeNull();
 });
