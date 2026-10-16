@@ -7,9 +7,9 @@ test.describe('Agenda y reservas', () => {
 
         await page.goto('/app/actividades');
         const taller = page.getByRole('region', { name: 'Taller de primeros auxilios' });
-        await taller.getByRole('button', { name: /^Reservar/ }).first().click();
-        await expect(page.getByText(/¡Reservado!/)).toBeVisible();
-        await expect(taller.getByText('Reservado').first()).toBeVisible();
+        await taller.getByRole('button', { name: /^Apuntarme/ }).first().click();
+        await expect(page.getByText(/Te apuntaste a/)).toBeVisible();
+        await expect(taller.getByText('Apuntado').first()).toBeVisible();
 
         await page.getByRole('link', { name: 'Mis reservas' }).click();
         await expect(page.getByText('Taller de primeros auxilios')).toBeVisible();
@@ -29,8 +29,8 @@ test.describe('Agenda y reservas', () => {
 
         await page.goto('/app/actividades');
         // Turno 04:14 del taller y turno 04:44 de la estación se pisan (el primero dura una hora).
-        await page.getByRole('region', { name: 'Taller de primeros auxilios' }).getByRole('button', { name: /^Reservar/ }).first().click();
-        await expect(page.getByText(/¡Reservado!/)).toBeVisible();
+        await page.getByRole('region', { name: 'Taller de primeros auxilios' }).getByRole('button', { name: /^Apuntarme/ }).first().click();
+        await expect(page.getByText(/Te apuntaste a/)).toBeVisible();
 
         await page.getByRole('region', { name: 'Estación JOTA: radioaficionados' }).getByRole('button', { name: /^Reservar/ }).first().click();
         await expect(page.getByText(/Choca con tu reserva/)).toBeVisible();
@@ -61,7 +61,7 @@ test.describe('Agenda y reservas', () => {
         for (const boton of await radio.getByRole('button', { name: /^Reservar/ }).all()) await expect(boton).toBeDisabled();
 
         // Los talleres no cuentan: siguen disponibles.
-        await expect(compa.getByRole('region', { name: 'Taller de primeros auxilios' }).getByRole('button', { name: /^Reservar/ }).first()).toBeEnabled();
+        await expect(compa.getByRole('region', { name: 'Taller de primeros auxilios' }).getByRole('button', { name: /^Apuntarme/ }).first()).toBeEnabled();
     });
 
     test('los Rovers reservan la estación como una sola unidad', async ({ browser }) => {
@@ -87,8 +87,8 @@ test.describe('Agenda y reservas', () => {
         const { page: dir } = await sesionDe(browser, '4000045');
 
         await pedro.goto('/app/actividades');
-        await pedro.getByRole('region', { name: 'Taller de primeros auxilios' }).getByRole('button', { name: /^Reservar/ }).nth(2).click();
-        await expect(pedro.getByText(/¡Reservado!/)).toBeVisible();
+        await pedro.getByRole('region', { name: 'Taller de primeros auxilios' }).getByRole('button', { name: /^Apuntarme/ }).nth(2).click();
+        await expect(pedro.getByText(/Te apuntaste a/)).toBeVisible();
 
         await dir.goto('/dirigente/reservas');
         await expect(dir.getByText('Águilas 3')).toBeVisible();
@@ -101,9 +101,23 @@ test.describe('Agenda y reservas', () => {
 
         // La reserva de otra unidad no aparece en la lista de este dirigente.
         await ana.goto('/app/actividades');
-        await ana.getByRole('region', { name: 'Taller de primeros auxilios' }).getByRole('button', { name: /^Reservar/ }).first().click();
-        await expect(ana.getByText(/¡Reservado!/)).toBeVisible();
+        await ana.getByRole('region', { name: 'Taller de primeros auxilios' }).getByRole('button', { name: /^Apuntarme/ }).first().click();
+        await expect(ana.getByText(/Te apuntaste a/)).toBeVisible();
         await dir.goto('/dirigente/reservas');
         await expect(dir.getByText('Yaguaretés 3')).toHaveCount(0);
+    });
+
+    test('un taller se cursa en un solo turno: al apuntarse, los otros horarios del taller quedan sin botón', async ({ browser }) => {
+        const { page } = await sesionDe(browser, '4000016');
+
+        await page.goto('/app/actividades');
+        const taller = page.getByRole('region', { name: 'Taller de primeros auxilios' });
+        await taller.getByRole('button', { name: /^Apuntarme/ }).first().click();
+        await expect(page.getByText(/Te apuntaste a/)).toBeVisible();
+
+        await expect(taller.getByText(/Ya estás apuntado a este taller/)).toBeVisible();
+        const otros = await taller.getByRole('button', { name: /^Apuntarme/ }).all();
+        expect(otros.length).toBeGreaterThan(0);
+        for (const boton of otros) await expect(boton).toBeDisabled();
     });
 });

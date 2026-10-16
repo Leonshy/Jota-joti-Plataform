@@ -8,6 +8,7 @@ use App\Models\Turno;
 use App\Models\User;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Lo que el participante ve en la Agenda: las actividades de su unidad con los turnos que todavía
@@ -18,13 +19,16 @@ class AgendaDelParticipante
 {
     /**
      * @return list<array{
-     *     id: int, titulo: string, lugar: string|null, taller: bool, por_equipo: bool, puntos: int,
+     *     id: int, titulo: string, lugar: string|null, taller: bool, por_equipo: bool, puntos: int, apuntado: bool,
      *     turnos: list<array{id: int, inicio: CarbonInterface, fin: CarbonInterface, lugares: int|null, comenzado: bool, reservado: bool}>
      * }>
      */
     public function actividades(User $user): array
     {
-        $reservados = $this->turnosReservados($user);
+        // Una sola consulta: los turnos vigentes reservados y las actividades en las que ya hay un turno (aunque haya pasado).
+        $propias = $this->reservasPropias($user);
+        $reservados = $propias->where('vigente', 1)->pluck('turno_id')->map(fn ($id) => (int) $id)->all();
+        $apuntadas = $propias->pluck('actividad_id')->map(fn ($id) => (int) $id)->unique()->values()->all();
 
         return Actividad::query()
             ->whereHas('unidades', fn (Builder $q) => $q->whereKey($user->unidad_id))
@@ -38,6 +42,8 @@ class AgendaDelParticipante
                 'taller' => $a->tipo->value === 'taller',
                 'por_equipo' => $a->esPorEquipo(),
                 'puntos' => $a->puntos,
+                // Un taller se cursa una sola vez: si ya hay un turno elegido (aunque haya pasado), los demás no se pueden elegir.
+                'apuntado' => in_array($a->getKey(), $apuntadas, true),
                 'turnos' => $a->turnos->map(fn (Turno $t) => [
                     'id' => $t->getKey(),
                     'inicio' => $t->inicio,
@@ -85,18 +91,22 @@ class AgendaDelParticipante
             ->all();
     }
 
-    /** @return list<int> */
-    private function turnosReservados(User $user): array
+    /** @return Collection<int, Reserva> con turno_id, actividad_id y vigente (1 si el turno todavía no terminó). */
+    private function reservasPropias(User $user): Collection
     {
-        return $this->consultaReservas($user)->pluck('reservas.turno_id')->all();
+        return $this->consultaReservas($user, soloVigentes: false)
+            ->reorder()
+            ->select('reservas.turno_id', 'turnos.actividad_id')
+            ->selectRaw('(turnos.fin > ?) as vigente', [now()])
+            ->get();
     }
 
-    private function consultaReservas(User $user): Builder
+    private function consultaReservas(User $user, bool $soloVigentes = true): Builder
     {
         return Reserva::query()
             ->select('reservas.*')
             ->join('turnos', 'turnos.id', '=', 'reservas.turno_id')
-            ->where('turnos.fin', '>', now())
+            ->when($soloVigentes, fn (Builder $q) => $q->where('turnos.fin', '>', now()))
             ->where(fn (Builder $q) => $q
                 ->where('reservas.user_id', $user->getKey())
                 ->when($user->patrulla_id, fn (Builder $p) => $p->orWhere('reservas.patrulla_id', $user->patrulla_id))

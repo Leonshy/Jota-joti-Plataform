@@ -123,11 +123,47 @@ it('crea una actividad que puede valer 0 puntos', function () {
         ->fillForm([
             'titulo' => 'Estación de radioaficionados', 'lugar' => 'Carpa de radio', 'tipo' => TipoActividad::EstacionJota->value,
             'modalidad' => Modalidad::Individual->value, 'puntos' => 0, 'unidades' => [$this->e->unidad->id],
+            'turnos' => [['inicio' => now()->addHour()->format('Y-m-d H:i'), 'fin' => now()->addHours(2)->format('Y-m-d H:i')]],
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
     expect(Actividad::first())->puntos->toBe(0)->tipo->toBe(TipoActividad::EstacionJota);
+});
+
+it('crea un taller junto con todos sus turnos y cupos', function () {
+    Livewire::test(CreateActividad::class)
+        ->fillForm([
+            'titulo' => 'Taller de nudos', 'lugar' => 'Salón grande', 'tipo' => TipoActividad::Taller->value,
+            'modalidad' => Modalidad::Individual->value, 'puntos' => 20, 'unidades' => [$this->e->unidad->id],
+            'turnos' => [
+                ['inicio' => now()->addHour()->format('Y-m-d H:i'), 'fin' => now()->addHours(2)->format('Y-m-d H:i'), 'cupo' => 12],
+                ['inicio' => now()->addHours(3)->format('Y-m-d H:i'), 'fin' => now()->addHours(4)->format('Y-m-d H:i'), 'cupo' => 8],
+            ],
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    $taller = Actividad::where('titulo', 'Taller de nudos')->sole();
+
+    expect($taller->turnos()->orderBy('inicio')->pluck('cupo')->all())->toBe([12, 8]);
+});
+
+it('en un taller el cupo de cada turno es obligatorio, y en una estación no se pide', function () {
+    $base = ['titulo' => 'Taller', 'lugar' => 'Salón', 'modalidad' => Modalidad::Individual->value, 'puntos' => 5, 'unidades' => [$this->e->unidad->id]];
+    $turno = ['inicio' => now()->addHour()->format('Y-m-d H:i'), 'fin' => now()->addHours(2)->format('Y-m-d H:i')];
+
+    Livewire::test(CreateActividad::class)
+        ->fillForm($base + ['tipo' => TipoActividad::Taller->value, 'turnos' => [$turno]])
+        ->call('create')->assertHasFormErrors(['turnos.0.cupo' => 'required']);
+
+    Livewire::test(CreateActividad::class)
+        ->fillForm($base + ['tipo' => TipoActividad::Taller->value, 'turnos' => []])
+        ->call('create')->assertHasFormErrors(['turnos']);
+
+    Livewire::test(CreateActividad::class)
+        ->fillForm(['titulo' => 'Estación', 'tipo' => TipoActividad::EstacionJota->value] + $base + ['turnos' => [$turno]])
+        ->call('create')->assertHasNoFormErrors();
 });
 
 it('lista las actividades con su cantidad de turnos', function () {

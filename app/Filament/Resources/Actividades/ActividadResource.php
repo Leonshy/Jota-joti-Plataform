@@ -12,6 +12,8 @@ use App\Models\Actividad;
 use BackedEnum;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
@@ -72,6 +74,21 @@ class ActividadResource extends Resource
                     ->helperText('Puede ser 0 (por ejemplo, una estación que no da puntos).'),
                 Select::make('unidades')->label('Unidades destino')->relationship('unidades', 'nombre')->multiple()->preload()->required()->native(false),
             ]),
+            // Se cargan junto con la actividad. Al editar, los turnos se manejan en la pestaña «Turnos» de abajo.
+            Section::make('Turnos')->description(fn (Get $get) => $esEstacion($get('tipo'))
+                ? 'Cada horario es de un solo equipo: está disponible u ocupado.'
+                : 'Cada turno tiene su horario y su cupo: cuántas personas (o patrullas, si es por equipo) pueden apuntarse.')
+                ->visibleOn('create')->schema([
+                    Repeater::make('turnos')->relationship()->label('Turnos')->hiddenLabel()
+                        ->defaultItems(1)->minItems(1)->addActionLabel('Agregar otro turno')->columns(3)
+                        ->schema([
+                            DateTimePicker::make('inicio')->label('Empieza')->required()->seconds(false),
+                            DateTimePicker::make('fin')->label('Termina')->required()->seconds(false)->after('inicio'),
+                            TextInput::make('cupo')->label('Cupo')->numeric()->integer()->minValue(1)->maxValue(10000)
+                                ->hidden(fn (Get $get) => $esEstacion($get('../../tipo')))
+                                ->required(fn (Get $get) => ! $esEstacion($get('../../tipo'))),
+                        ]),
+                ]),
         ]);
     }
 

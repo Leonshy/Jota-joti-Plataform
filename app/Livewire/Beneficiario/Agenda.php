@@ -9,6 +9,7 @@ use App\Domain\Actividades\EstacionEnCurso;
 use App\Domain\Actividades\ReservaDuplicada;
 use App\Domain\Actividades\Reservar;
 use App\Domain\Actividades\SinPatrulla;
+use App\Domain\Actividades\TallerYaApuntado;
 use App\Domain\Actividades\TurnoLleno;
 use App\Domain\Actividades\TurnoYaComenzo;
 use App\Models\Turno;
@@ -49,9 +50,12 @@ class Agenda extends Component
         try {
             $reservar($user, $turno);
             $this->tono = 'exito';
-            $this->mensaje = __('jota.actividades.reservado_texto', ['actividad' => $turno->actividad->titulo, 'cuando' => cuando($turno->inicio)]);
+            $clave = $turno->actividad->esEstacion() ? 'reservado_texto' : ($turno->actividad->esPorEquipo() ? 'apuntado_texto_equipo' : 'apuntado_texto');
+            $this->mensaje = __('jota.actividades.'.$clave, ['actividad' => $turno->actividad->titulo, 'cuando' => cuando($turno->inicio)]);
         } catch (TurnoLleno) {
             $this->mensaje = __('jota.actividades.error_lleno');
+        } catch (TallerYaApuntado $e) {
+            $this->mensaje = __($e->porEquipo ? 'jota.actividades.error_taller_ya_equipo' : 'jota.actividades.error_taller_ya', ['actividad' => $e->actividad]);
         } catch (ReservaDuplicada) {
             $this->mensaje = __('jota.actividades.error_duplicada');
         } catch (SinPatrulla) {

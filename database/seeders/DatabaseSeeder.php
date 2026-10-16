@@ -115,7 +115,7 @@ class DatabaseSeeder extends Seeder
         $todas = [$tropa, $caminantes, $rovers];
 
         $crear(TipoActividad::Taller, 'Taller de primeros auxilios', 'Enfermería', Modalidad::Individual, 20, $todas, [
-            ['+1 hour', '+2 hours', 10], ['+3 hours', '+4 hours', 8], ['+5 hours', '+6 hours', null],
+            ['+1 hour', '+2 hours', 10], ['+3 hours', '+4 hours', 8], ['+5 hours', '+6 hours', 12],
         ]);
         // Estaciones JOTA: siempre por equipo (los Rovers, como unidad) y cada horario es de un solo equipo (cupo 1).
         $crear(TipoActividad::EstacionJota, 'Estación JOTA: radioaficionados', 'Carpa de radio', Modalidad::Patrulla, 15, $todas, [

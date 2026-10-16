@@ -128,6 +128,10 @@ y vuelve a ese QR. La raíz `/` redirige: sin sesión a `/ingresar`, con sesión
 **Lugar de talleres, estaciones y misiones — hecho (16/10/2026):** columna `lugar` (migración `agrega_lugar_a_actividades_y_misiones`), campo obligatorio en el
 panel para actividades y opcional en misiones, y visible para el participante en la agenda, mis reservas, el inicio (próximo turno), la lista y el detalle de misión. Lo ya cargado sin lugar no
 muestra nada. 1.036 tests y 50 pruebas de navegador.
+**Talleres con turnos y cupos (16/10/2026):** el cupo de cada turno de taller es obligatorio (personas, o patrullas si el taller es por equipo); el taller se crea con
+todos sus turnos en el mismo formulario; en los talleres la gente se **apunta** («Apuntarme») y en las estaciones se **reserva**; un taller se cursa en **un solo turno**
+(persona o equipo; cuenta también un turno ya pasado); se pueden cursar varios talleres a la vez mientras no se pisen los horarios, sin la regla de «una a la vez» de
+las estaciones. 1.049 tests y 51 pruebas de navegador.
 **Pendiente:** aprobación del diseño y del copy por Leonardo; fuente definitiva y tema del panel Filament (sigue con los colores por defecto).
 
 **Cierre:** diseño aprobado.

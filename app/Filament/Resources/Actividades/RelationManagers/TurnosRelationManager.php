@@ -33,12 +33,13 @@ class TurnosRelationManager extends RelationManager
             DateTimePicker::make('inicio')->label('Empieza')->required()->seconds(false)->disabled($conReservas),
             DateTimePicker::make('fin')->label('Termina')->required()->seconds(false)->after('inicio')->disabled($conReservas)
                 ->helperText('Con reservas hechas no se puede mover el horario: cancelalas primero.'),
-            TextInput::make('cupo')->label('Cupo (opcional)')->numeric()->integer()->minValue(1)->maxValue(10000)
-                // En la estación JOTA cada horario es de un solo equipo: no se elige cupo.
+            TextInput::make('cupo')->label('Cupo')->numeric()->integer()->minValue(1)->maxValue(10000)
+                // En la estación JOTA cada horario es de un solo equipo: no se elige cupo. En los talleres es obligatorio.
                 ->hidden(fn () => $this->getOwnerRecord()->esEstacion())
+                ->required(fn () => ! $this->getOwnerRecord()->esEstacion())
                 ->helperText(fn () => $this->getOwnerRecord()->esPorEquipo()
-                    ? 'Cuenta patrullas: cuántas pueden reservar este turno. Vacío = sin tope.'
-                    : 'Cuenta personas: cuántas pueden reservar este turno. Vacío = sin tope.'),
+                    ? 'Cuántas patrullas pueden apuntarse a este turno.'
+                    : 'Cuántas personas pueden apuntarse a este turno.'),
         ]);
     }
 
@@ -49,7 +50,7 @@ class TurnosRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('inicio')->label('Empieza')->dateTime('d/m H:i')->sortable(),
                 TextColumn::make('fin')->label('Termina')->dateTime('d/m H:i')->sortable(),
-                TextColumn::make('cupo')->label('Cupo')->formatStateUsing(fn ($state) => $this->getOwnerRecord()->esEstacion() ? '1 equipo' : $state)->placeholder('Sin tope'),
+                TextColumn::make('cupo')->label('Cupo')->formatStateUsing(fn ($state) => $this->getOwnerRecord()->esEstacion() ? '1 equipo' : $state)->placeholder('Sin tope (turno viejo)'),
                 TextColumn::make('reservas_count')->label('Reservas')->numeric(),
             ])
             ->headerActions([CreateAction::make()->label('Nuevo turno')])

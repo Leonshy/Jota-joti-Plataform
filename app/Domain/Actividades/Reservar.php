@@ -34,6 +34,7 @@ class Reservar
      * @throws TurnoLleno
      * @throws ChoqueDeHorario
      * @throws EstacionEnCurso
+     * @throws TallerYaApuntado
      */
     public function __invoke(User $user, Turno $turno): Reserva
     {
@@ -82,6 +83,12 @@ class Reservar
                 throw new ReservaDuplicada;
             }
 
+            // Un taller se cursa una sola vez: un solo turno por taller, para la persona o para el equipo. Se controla acá, con la
+            // persona o el equipo ya bloqueados, así dos pedidos a la vez no pueden apuntar a dos turnos del mismo taller.
+            if (! $actual->actividad->esEstacion() && self::yaApuntado($actual->actividad_id, $sujeto)) {
+                throw new TallerYaApuntado($actual->actividad->titulo, $equipo !== null);
+            }
+
             if ($actual->cupo !== null && $actual->reservas()->count() >= $actual->cupo) {
                 throw new TurnoLleno;
             }
@@ -96,6 +103,20 @@ class Reservar
 
             return Reserva::create(['turno_id' => $actual->getKey()] + $sujeto);
         });
+    }
+
+    /**
+     * Si la persona o el equipo ya tiene una reserva (aunque ya haya pasado) en algún turno de esa actividad.
+     *
+     * @param  array<string, int>  $sujeto  user_id, patrulla_id o unidad_id
+     */
+    public static function yaApuntado(int $actividadId, array $sujeto): bool
+    {
+        return Reserva::query()
+            ->join('turnos', 'turnos.id', '=', 'reservas.turno_id')
+            ->where('turnos.actividad_id', $actividadId)
+            ->where(collect($sujeto)->mapWithKeys(fn ($valor, $columna) => ['reservas.'.$columna => $valor])->all())
+            ->exists();
     }
 
     /**
