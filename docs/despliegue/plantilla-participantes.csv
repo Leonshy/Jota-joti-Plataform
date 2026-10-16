@@ -1,0 +1,6 @@
+ci,nombre,grupo,unidad,patrulla,rol
+1000001,Ejemplo Uno (borrar esta fila),General Genes,Tropa,Halcones,beneficiario
+1000002,Ejemplo Dos (borrar esta fila),General Genes,Tropa,Halcones,beneficiario
+1000003,Ejemplo Tres (borrar esta fila),General Aquino,Caminantes,Pumas,beneficiario
+1000004,Ejemplo Cuatro (borrar esta fila),General Genes,Rovers,,beneficiario
+1000005,Ejemplo Dirigente (borrar esta fila),General Genes,Tropa,,dirigente
