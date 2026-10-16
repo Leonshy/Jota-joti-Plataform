@@ -67,11 +67,25 @@ El último comando debe terminar sin problemas críticos. Si marca algo, se corr
 
 | Frecuencia | Comando |
 |---|---|
+| Cada minuto | `/opt/plesk/php/8.3/bin/php /var/www/vhosts/naranja.com.py/jota-joti.naranja.com.py/artisan schedule:run` |
 | Cada minuto | `/opt/plesk/php/8.3/bin/php /var/www/vhosts/naranja.com.py/jota-joti.naranja.com.py/artisan queue:work --stop-when-empty --max-time=55` |
-| Cada hora (durante el evento) | `/opt/plesk/php/8.3/bin/php /var/www/vhosts/naranja.com.py/jota-joti.naranja.com.py/artisan jota:reconciliar` |
 
-El primero procesa las fotos de las entregas (sin él quedan «procesando»). `laravel-backup` todavía no está instalado: hasta
-que se configure, pedir un respaldo de la base desde Plesk (Bases de datos → Exportar volcado) o programarlo ahí.
+- `schedule:run` dispara lo que define `routes/console.php`: respaldo de la base cada hora (`:00`), `jota:reconciliar`
+  (`:10`), `backup:monitor` (`:30`) y la limpieza de respaldos viejos a las 03:30.
+- `queue:work` procesa las fotos de las entregas (sin él quedan «procesando»).
+
+## 2b. Respaldo de la base
+
+- Cada hora se guarda un `.zip` **cifrado** en `storage/app/private/JOTA-JOTI 2026/` (solo la base, el volcado va en gzip).
+- La contraseña es `BACKUP_ARCHIVE_PASSWORD` del `.env`. Generala con `php -r "echo bin2hex(random_bytes(24));"` y **guardala
+  fuera del servidor** (gestor de contraseñas): sin ella el respaldo no se puede abrir.
+- Retención: todos por 7 días, uno por día hasta 16 días, luego semanales (se limpia solo, tope de 5 GB).
+- `jota:verificar-produccion` marca error si falta la contraseña. Si `mysqldump` no está en el PATH, poné su carpeta en `DB_DUMP_PATH`.
+- Probar una vez en el servidor: `php artisan backup:run --only-db` y `php artisan backup:list` (debe verse «Healthy»).
+- **Copia fuera del servidor:** un respaldo en el mismo servidor no sirve si el servidor se pierde. Antes del evento, y al
+  cerrarlo, bajar el último a la Mac: `scp "naranjacom@64.176.19.59:/var/www/vhosts/naranja.com.py/jota-joti.naranja.com.py/storage/app/private/JOTA-JOTI 2026/*.zip" ~/respaldos-jota/`
+- **Restaurar:** descomprimir el zip con la contraseña (7-Zip/Keka; el `unzip` de macOS no abre zips con AES), y luego
+  `gunzip -c db-dumps/mysql-<base>.sql.gz | mysql -u USUARIO -p BASE`.
 
 ## 3. Actualizaciones
 

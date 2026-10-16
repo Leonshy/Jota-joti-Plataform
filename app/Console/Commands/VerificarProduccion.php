@@ -70,6 +70,7 @@ class VerificarProduccion extends Command
         $this->chequeo('Hay proxies de confianza configurados (TRUSTED_PROXIES)', filled(env('TRUSTED_PROXIES')), 'sin eso Laravel no sabe que la conexión original era https', critico: false);
         $this->chequeo('La cola no es «sync»', config('queue.default') !== 'sync', 'las fotos se procesarían dentro de la petición');
         $this->chequeo('La caché no es «array»', config('cache.default') !== 'array', 'se perdería en cada petición (el ranking y los límites dependen de ella)');
+        $this->chequeo('El respaldo tiene contraseña (BACKUP_ARCHIVE_PASSWORD)', filled(config('backup.backup.password')), 'los respaldos de la base llevan datos de menores: tienen que ir cifrados');
         $this->chequeo('La vista previa del diseño (/diseno) no está publicada', ! Route::has('diseno.guia'), 'esas pantallas con datos de ejemplo no deben existir en producción');
     }
 
