@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('unidad_id')->nullable()->constrained('unidades');
             $table->foreignId('patrulla_id')->nullable()->constrained('patrullas');
             $table->string('pin_hash')->nullable();
-            $table->timestamp('activado_at')->nullable();
+            $table->dateTime('activado_at')->nullable();
             $table->integer('puntos')->default(0); // saldo cacheado; puede ser negativo (D14)
             $table->unsignedInteger('jlis')->default(0); // saldo cacheado; nunca negativo
             $table->rememberToken();

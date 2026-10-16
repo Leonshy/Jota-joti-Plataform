@@ -14,9 +14,9 @@ return new class extends Migration
             $table->text('descripcion');
             $table->string('modalidad'); // App\Enums\Modalidad
             $table->unsignedInteger('puntos');
-            $table->timestamp('lanza_at')->index();
-            $table->timestamp('vence_at')->nullable();
-            $table->timestamp('cerrada_at')->nullable();
+            $table->dateTime('lanza_at')->index();
+            $table->dateTime('vence_at')->nullable();
+            $table->dateTime('cerrada_at')->nullable();
             $table->timestamps();
         });
 
@@ -35,7 +35,7 @@ return new class extends Migration
             $table->string('estado')->default('pendiente'); // App\Enums\EstadoEntrega
             $table->text('motivo_rechazo')->nullable();
             $table->foreignId('revisado_por')->nullable()->constrained('users');
-            $table->timestamp('revisado_at')->nullable();
+            $table->dateTime('revisado_at')->nullable();
             // Idempotencia en base de datos (CLAUDE.md §2.3): solo puede existir UNA entrega aprobada
             // por misión y por sujeto (la persona en misiones individuales, la patrulla en las de
             // patrulla). Un segundo UPDATE a "aprobada" falla con violación de unicidad.
@@ -54,7 +54,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('entrega_id')->constrained('entregas')->cascadeOnDelete();
             $table->string('ruta'); // disco "private"; antes de procesarse apunta al original en tmp/
-            $table->timestamp('procesada_at')->nullable(); // solo se sirve si ya fue re-codificada
+            $table->dateTime('procesada_at')->nullable(); // solo se sirve si ya fue re-codificada
             $table->timestamps();
         });
     }

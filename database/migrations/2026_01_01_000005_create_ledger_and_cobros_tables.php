@@ -17,7 +17,7 @@ return new class extends Migration
             $table->nullableMorphs('origen');
             $table->string('motivo')->nullable();
             $table->foreignId('registrado_por')->nullable()->constrained('users');
-            $table->timestamp('created_at')->useCurrent();
+            $table->dateTime('created_at')->useCurrent();
 
             $table->index(['user_id', 'created_at']);
         });
@@ -29,7 +29,7 @@ return new class extends Migration
             $table->nullableMorphs('origen');
             $table->string('motivo')->nullable();
             $table->foreignId('registrado_por')->nullable()->constrained('users');
-            $table->timestamp('created_at')->useCurrent();
+            $table->dateTime('created_at')->useCurrent();
 
             $table->index(['patrulla_id', 'created_at']);
         });
@@ -41,7 +41,7 @@ return new class extends Migration
             $table->nullableMorphs('origen');
             $table->string('motivo')->nullable();
             $table->foreignId('registrado_por')->nullable()->constrained('users');
-            $table->timestamp('created_at')->useCurrent();
+            $table->dateTime('created_at')->useCurrent();
 
             $table->index(['user_id', 'created_at']);
         });
@@ -56,7 +56,7 @@ return new class extends Migration
             $table->unsignedInteger('cantidad');
             $table->string('motivo');
             $table->foreignId('registrado_por')->constrained('users');
-            $table->timestamp('anulada_at')->nullable();
+            $table->dateTime('anulada_at')->nullable();
             $table->foreignId('anulada_por')->nullable()->constrained('users');
             $table->string('motivo_anulacion')->nullable();
             $table->timestamps();
@@ -71,9 +71,9 @@ return new class extends Migration
             $table->string('token', 64)->unique();
             $table->unsignedInteger('monto');
             $table->foreignId('creado_por')->constrained('users');
-            $table->timestamp('vence_at');
+            $table->dateTime('vence_at');
             $table->foreignId('pagado_por')->nullable()->constrained('users');
-            $table->timestamp('pagado_at')->nullable();
+            $table->dateTime('pagado_at')->nullable();
             $table->timestamps();
 
             $table->index(['creado_por', 'created_at']);

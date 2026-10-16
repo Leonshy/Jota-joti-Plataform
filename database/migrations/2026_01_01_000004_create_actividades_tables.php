@@ -26,8 +26,8 @@ return new class extends Migration
         Schema::create('turnos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('actividad_id')->constrained('actividades')->cascadeOnDelete();
-            $table->timestamp('inicio');
-            $table->timestamp('fin');
+            $table->dateTime('inicio');
+            $table->dateTime('fin');
             $table->unsignedSmallInteger('cupo')->nullable();
             $table->timestamps();
 
@@ -51,8 +51,8 @@ return new class extends Migration
             $table->foreignId('turno_id')->nullable()->constrained('turnos');
             $table->foreignId('abierta_por')->constrained('users');
             $table->string('secreto', 64); // clave HMAC del QR rotativo (hex)
-            $table->timestamp('abierta_at');
-            $table->timestamp('cerrada_at')->nullable();
+            $table->dateTime('abierta_at');
+            $table->dateTime('cerrada_at')->nullable();
             // Una sola sesión abierta por actividad, garantizada por la base (cerrada_at nulo = abierta).
             $table->unsignedBigInteger('abierta_unica')->nullable()->storedAs('CASE WHEN cerrada_at IS NULL THEN actividad_id ELSE NULL END');
             $table->timestamps();
