@@ -2,6 +2,7 @@
 
 use App\Domain\Actividades\AbrirSesionAsistencia;
 use App\Domain\Actividades\TokenRotativo;
+use App\Enums\Modalidad;
 use App\Enums\Rol;
 use App\Models\Asistencia;
 use App\Models\CumplimientoEquipo;
@@ -58,6 +59,34 @@ it('dos integrantes reservando a la vez por la patrulla: una sola reserva', func
     $r = concurrentes($e->miembros->map(fn ($m) => tareaReservar($m->id, $turno->id))->all());
 
     expect($r['ok'])->toBe(1)->and($r['duplicada'])->toBe(3)->and(Reserva::count())->toBe(1);
+});
+
+it('la misma persona apuntándose a la vez a cuatro turnos del mismo taller: pasa solo uno', function () {
+    $e = escenario(1);
+    $taller = actividadPara($e->unidad);
+    $turnos = [
+        turnoDe($taller, '+1 hour', '+2 hours', cupo: 5), turnoDe($taller, '+3 hours', '+4 hours', cupo: 5),
+        turnoDe($taller, '+5 hours', '+6 hours', cupo: 5), turnoDe($taller, '+7 hours', '+8 hours', cupo: 5),
+    ];
+
+    $r = concurrentes(array_map(fn ($t) => tareaReservar($e->miembros[0]->id, $t->id), $turnos));
+
+    expect($r['ok'])->toBe(1)->and($r['taller ya apuntado'])->toBe(3)
+        ->and(Reserva::where('user_id', $e->miembros[0]->id)->count())->toBe(1);
+});
+
+it('cuatro integrantes apuntando a la vez a la patrulla en turnos distintos del mismo taller: pasa solo uno', function () {
+    $e = escenario(4);
+    $taller = actividadPara($e->unidad, ['modalidad' => Modalidad::Patrulla]);
+    $turnos = [
+        turnoDe($taller, '+1 hour', '+2 hours', cupo: 5), turnoDe($taller, '+3 hours', '+4 hours', cupo: 5),
+        turnoDe($taller, '+5 hours', '+6 hours', cupo: 5), turnoDe($taller, '+7 hours', '+8 hours', cupo: 5),
+    ];
+
+    $r = concurrentes($e->miembros->map(fn ($m, $i) => tareaReservar($m->id, $turnos[$i]->id))->all());
+
+    expect($r['ok'])->toBe(1)->and($r['taller ya apuntado'])->toBe(3)
+        ->and(Reserva::where('patrulla_id', $e->patrulla->id)->count())->toBe(1);
 });
 
 it('doble escaneo simultáneo: un solo registro y una sola acreditación', function () {

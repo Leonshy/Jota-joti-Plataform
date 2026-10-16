@@ -9,6 +9,7 @@ use App\Domain\Actividades\RegistrarAsistencia;
 use App\Domain\Actividades\ReservaDuplicada;
 use App\Domain\Actividades\Reservar;
 use App\Domain\Actividades\SesionYaAbierta;
+use App\Domain\Actividades\TallerYaApuntado;
 use App\Domain\Actividades\TurnoLleno;
 use App\Domain\Ledger\Jlis;
 use App\Domain\Ledger\Puntos;
@@ -107,6 +108,8 @@ function tareaReservar(int $userId, int $turnoId): Closure
             return 'choque';
         } catch (ReservaDuplicada) {
             return 'duplicada';
+        } catch (TallerYaApuntado) {
+            return 'taller ya apuntado';
         }
     };
 }
