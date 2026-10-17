@@ -230,10 +230,13 @@ it('las fotos de la entrega solo se ven una vez procesadas y por quien correspon
     $this->actingAs($this->e->miembros[1])->get(route('entregas.imagen', $imagen))->assertForbidden();
 });
 
-it('el ranking del dirigente es anónimo', function () {
+it('el ranking del dirigente muestra los nombres de las patrullas, y el del participante sigue anónimo', function () {
     $r = rankingEquipo();
 
-    $html = $this->actingAs($r->dirigente)->get(route('dirigente.ranking'))->assertOk()->getContent();
+    $this->actingAs($r->dirigente)->get(route('dirigente.ranking'))->assertOk()
+        ->assertSee('Pumas')->assertSee('Águilas')->assertSee('G.S. General Aquino')->assertSee('3 integrantes')->assertSee('Patrulla 50 + individuales 90')
+        ->assertDontSee($r->ana->name)->assertDontSee($r->ana->ci);
 
-    expect($html)->not->toContain($r->ana->name)->not->toContain($r->pumas->nombre);
+    $html = $this->actingAs($r->ana)->get(route('app.ranking'))->assertOk()->getContent();
+    expect($html)->not->toContain('Pumas')->not->toContain($r->beto->name);
 });

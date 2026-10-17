@@ -20,9 +20,12 @@ use Illuminate\Support\Facades\Gate;
  *
  * Empates comparten posición (1, 1, 3).
  *
- * REGLA DE ORO (CLAUDE.md §2.8): la vista del beneficiario y la del dirigente exponen SOLO
- * `posicion` y `puntaje`. Nunca nombres, ids, ni nada que marque la posición propia. La caché
- * pública se arma aparte de la del admin y nunca contiene identidades.
+ * REGLA DE ORO (CLAUDE.md §2.8): la vista del BENEFICIARIO expone SOLO `posicion` y `puntaje`.
+ * Nunca nombres, ids, ni nada que marque la posición propia. Su caché pública se arma aparte de
+ * la del dirigente y la del admin y nunca contiene identidades.
+ *
+ * El DIRIGENTE ve los nombres de su unidad (decisión del grupo del 17/10/2026, que reemplaza a D6): las
+ * patrullas en Tropa y Caminantes, las personas en Rovers. Sin CI ni ids, con su propia caché.
  */
 class RankingUnidad
 {
@@ -65,13 +68,30 @@ class RankingUnidad
     }
 
     /**
-     * El dirigente ve la tabla de su unidad sin nombres (D6).
+     * Tabla de una unidad CON nombres, para el dirigente (y el admin que mira una unidad): sin CI ni ids. Cacheada aparte de la
+     * pública, así los nombres nunca llegan a la caché que usa el beneficiario.
      *
-     * @return array{modo: string, tabla: list<array{posicion: int, puntaje: int}>, se_actualiza_cada: int}
+     * @return list<array<string, mixed>>
+     */
+    public function conNombres(Unidad $unidad): array
+    {
+        return Cache::remember("ranking:dirigente:{$unidad->getKey()}", self::TTL, function () use ($unidad) {
+            $campos = $unidad->modo_ranking === ModoRanking::Equipo
+                ? ['posicion', 'patrulla', 'grupo', 'puntaje', 'puntos_patrulla', 'puntos_individuales', 'integrantes']
+                : ['posicion', 'nombre', 'grupo', 'puntaje'];
+
+            return array_map(fn (array $f) => array_intersect_key($f, array_flip($campos)), $this->calcular($unidad));
+        });
+    }
+
+    /**
+     * El dirigente ve la tabla de su unidad con nombres: patrullas (Tropa, Caminantes) o personas (Rovers).
+     *
+     * @return array{modo: string, tabla: list<array<string, mixed>>, se_actualiza_cada: int}
      */
     public function vistaDirigente(User $user, ?int $unidadId = null): array
     {
-        // El administrador mira la unidad que eligió (misma tabla anónima); el dirigente, siempre la suya.
+        // El administrador mira la unidad que eligió; el dirigente, siempre la suya.
         if ($user->rol === Rol::Admin && $unidadId) {
             $unidad = Unidad::query()->findOrFail($unidadId);
             Gate::forUser($user)->authorize('verRankingCompleto', $unidad);
@@ -81,7 +101,7 @@ class RankingUnidad
 
         return [
             'modo' => $unidad->modo_ranking->value,
-            'tabla' => $this->publico($unidad),
+            'tabla' => $this->conNombres($unidad),
             'se_actualiza_cada' => self::TTL,
         ];
     }

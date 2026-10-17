@@ -193,14 +193,60 @@ it('Rovers: la vista no tiene puntos de patrulla y también es anónima', functi
         ->and(json_encode($vista))->not->toContain('Rover');
 });
 
-it('el dirigente ve la tabla de su unidad sin nombres (D6)', function () {
+it('el dirigente ve la tabla de su unidad CON los nombres de las patrullas, sin CI ni ids ni nombres de personas', function () {
     $r = rankingEquipo();
 
     $vista = $this->ranking->vistaDirigente($r->dirigente);
 
-    expect($vista['tabla'])->toHaveCount(3)
-        ->and(json_encode($vista))->not->toContain('Águilas')->not->toContain('Ana')
-        ->and(array_keys($vista))->toBe(['modo', 'tabla', 'se_actualiza_cada']);
+    expect($vista['tabla'])->toEqual([
+        ['posicion' => 1, 'patrulla' => 'Pumas', 'grupo' => 'G.S. General Aquino', 'puntos_patrulla' => 50, 'puntos_individuales' => 90, 'integrantes' => 3, 'puntaje' => 140],
+        ['posicion' => 2, 'patrulla' => 'Águilas', 'grupo' => 'G.S. General Genes', 'puntos_patrulla' => 100, 'puntos_individuales' => 30, 'integrantes' => 2, 'puntaje' => 130],
+        ['posicion' => 3, 'patrulla' => 'Zorros', 'grupo' => 'G.S. General Genes', 'puntos_patrulla' => 0, 'puntos_individuales' => 0, 'integrantes' => 0, 'puntaje' => 0],
+    ])->and(array_keys($vista))->toBe(['modo', 'tabla', 'se_actualiza_cada']);
+
+    $json = json_encode($vista);
+    foreach (['Ana', 'Beto', 'Carla', $r->ana->ci, 'patrulla_id', 'user_id', '"ci"'] as $privado) {
+        expect($json)->not->toContain($privado);
+    }
+});
+
+it('en los Rovers (individual) el dirigente ve los nombres de las personas, sin CI', function () {
+    $rovers = Unidad::factory()->individual()->create(['nombre' => 'Rovers']);
+    $grupo = Grupo::firstOrCreate(['nombre' => 'G.S. General Genes']);
+    darPuntos(User::factory()->create(['name' => 'Rover Uno', 'unidad_id' => $rovers->id, 'patrulla_id' => null, 'grupo_id' => $grupo->id]), 30);
+    $dos = darPuntos(User::factory()->create(['name' => 'Rover Dos', 'unidad_id' => $rovers->id, 'patrulla_id' => null, 'grupo_id' => $grupo->id]), 70);
+    $dir = User::factory()->rol(Rol::Dirigente)->create(['unidad_id' => $rovers->id]);
+
+    $vista = $this->ranking->vistaDirigente($dir);
+
+    expect($vista['modo'])->toBe('individual')
+        ->and($vista['tabla'])->toEqual([
+            ['posicion' => 1, 'nombre' => 'Rover Dos', 'grupo' => 'G.S. General Genes', 'puntaje' => 70],
+            ['posicion' => 2, 'nombre' => 'Rover Uno', 'grupo' => 'G.S. General Genes', 'puntaje' => 30],
+        ])
+        ->and(json_encode($vista))->not->toContain($dos->ci);
+});
+
+it('el dirigente solo ve los nombres de SU unidad, y el admin los de la unidad que elija', function () {
+    $r = rankingEquipo('Tropa');
+    $otra = rankingEquipo('Caminantes');
+
+    expect(json_encode($this->ranking->vistaDirigente($otra->dirigente)))->not->toContain('Dirigente Gómez')->and(collect($this->ranking->vistaDirigente($otra->dirigente)['tabla'])->pluck('patrulla')->all())->toHaveCount(3);
+
+    $admin = User::factory()->rol(Rol::Admin)->create();
+    expect(collect($this->ranking->vistaDirigente($admin, $r->unidad->id)['tabla'])->pluck('patrulla')->all())->toBe(['Pumas', 'Águilas', 'Zorros']);
+});
+
+it('ver los nombres no contamina lo que ve el participante: su tabla y su caché siguen anónimas', function () {
+    $r = rankingEquipo();
+
+    $this->ranking->vistaDirigente($r->dirigente); // arma la caché con nombres del dirigente
+    $vista = $this->ranking->vistaBeneficiario($r->ana);
+
+    expect(json_encode($vista))->not->toContain('Águilas')->not->toContain('Pumas')
+        ->and(collect($vista['tabla'])->map(fn ($fila) => array_keys($fila))->unique()->all())->toBe([['posicion', 'puntaje']])
+        ->and(json_encode(Cache::get("ranking:publico:{$r->unidad->id}")))->not->toContain('Pumas')
+        ->and(Cache::get("ranking:dirigente:{$r->unidad->id}"))->not->toBeNull();
 });
 
 it('cada rol recibe solo su vista: un beneficiario no pide la del dirigente y viceversa', function () {
@@ -248,7 +294,10 @@ it('el endpoint del ranking responde por rol y no filtra identidades', function 
         expect($cuerpo)->not->toContain($secreto);
     }
 
-    $this->actingAs($r->dirigente)->getJson(route('ranking'))->assertOk()->assertJsonMissingPath('mis_puntos');
+    // El dirigente sí recibe los nombres de las patrullas de su unidad, pero nunca CI ni ids.
+    $dirigente = $this->actingAs($r->dirigente)->getJson(route('ranking'))->assertOk()->assertJsonMissingPath('mis_puntos')
+        ->assertJsonPath('tabla.0.patrulla', 'Pumas');
+    expect($dirigente->getContent())->not->toContain($r->ana->ci)->not->toContain('patrulla_id')->not->toContain('Beto');
 });
 
 it('el ranking pide sesión y se niega a tienda y admin (el admin usa el panel)', function () {

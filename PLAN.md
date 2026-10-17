@@ -139,6 +139,8 @@ concurrencia real, y 3 pruebas de navegador nuevas.
 **Cuenta de prueba en producción (17/10/2026):** `jota:eliminar-usuario-de-prueba {ci}` (excepción acordada a «los movimientos no se borran»): simulacro, respaldo previo,
 confirmación escribiendo el CI, una sola transacción, y revierte lo que la cuenta acreditó a su patrulla y compañeros; se niega si hubo tienda o si un compañero ya
 gastó esos LisCoins, y verifica que los saldos coincidan con los movimientos. Clave SSH limitada (`deploy/ssh-comandos.sh`). 1.120 tests.
+**Ranking con nombres para el dirigente (17/10/2026):** el dirigente ve los nombres de las patrullas de su unidad (Tropa y Caminantes) con integrantes y desglose, o de las
+personas (Rovers); sin CI ni ids y con caché propia. El participante sigue anónimo (regla 8). Reemplaza a D6. 1.129 tests y 56 pruebas de navegador.
 **Pendiente:** aprobación del diseño y del copy por Leonardo; fuente definitiva y tema del panel Filament (sigue con los colores por defecto).
 
 **Cierre:** diseño aprobado.

@@ -515,7 +515,7 @@ dirigentes tiene que ser **al menos una semana antes** del evento.
 | D3 | Una reserva de patrulla choca con la reserva individual de un integrante | Se bloquea y se informa quién tiene el choque |
 | D4 | Las estaciones JOTA dan puntos | Sí, configurable igual que los talleres (puede ser 0) |
 | D5 | Cupo de patrullas por turno en actividades por equipo | Cupo opcional por turno |
-| D6 | El dirigente ve nombres en el ranking de su unidad | No: solo el administrador ve nombres |
+| D6 | El dirigente ve nombres en el ranking de su unidad | **Sí** (decidido el 17/10/2026, reemplaza el «no» original): el dirigente ve los nombres de las patrullas de su unidad (de las personas, en Rovers), sin CI. El participante sigue viendo su ranking anónimo |
 | D7 | El ranking mezcla los dos grupos scouts | Sí, un ranking por unidad |
 | D8 | Largo del PIN y política de bloqueo | **Resuelta:** 4 dígitos, sin bloqueo ni límite de intentos |
 | D9 | Congelar el ranking antes de la premiación | El admin deja de validar; congelamiento formal en 2027 |

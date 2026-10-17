@@ -8,7 +8,7 @@
     @if ($vista['tabla'] === [])
         <x-ui.vacio icono="trophy" :titulo="__('jota.ranking.vacio_titulo')" :texto="__('jota.ranking.vacio_texto')" />
     @else
-        <x-ui.tabla-ranking :titulo="__('jota.ranking.titulo', ['unidad' => $unidad])" :filas="array_map(fn ($f) => [$f['posicion'], $f['puntaje']], $vista['tabla'])" />
-        <p class="text-sm text-texto-suave">{{ __('jota.ranking.anonimo') }}</p>
+        <x-ui.tabla-ranking-nombres :titulo="__('jota.ranking.titulo', ['unidad' => $unidad])" :modo="$vista['modo']" :filas="$vista['tabla']" />
+        <p class="text-sm text-texto-suave">{{ __('jota.ranking.empates') }} {{ __('jota.ranking.dirigente_nota') }}</p>
     @endif
 </x-ui.pantalla>

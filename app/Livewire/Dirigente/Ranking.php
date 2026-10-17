@@ -7,7 +7,7 @@ use App\Models\Unidad;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-/** Ranking de la unidad del dirigente: solo puesto y puntaje, sin nombres (D6). */
+/** Ranking de la unidad del dirigente, con los nombres de las patrullas (o de las personas, en Rovers). El participante lo ve anónimo. */
 #[Layout('components.layouts.movil')]
 class Ranking extends Component
 {
