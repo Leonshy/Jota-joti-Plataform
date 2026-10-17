@@ -89,8 +89,13 @@ class Agenda extends Component
         $equipo = $user->patrulla()->value('nombre')
             ?? (EquipoDeReserva::unidadEsEquipo($user->unidad_id) ? $user->unidad()->value('nombre') : null);
 
+        $actividades = $agenda->actividades($user);
+
         return view('livewire.beneficiario.agenda', [
-            'actividades' => $agenda->actividades($user),
+            'actividades' => $actividades,
+            // Dos grupos bien separados, ya ordenados por el dominio.
+            'talleres' => array_values(array_filter($actividades, fn ($a) => $a['taller'])),
+            'estaciones' => array_values(array_filter($actividades, fn ($a) => ! $a['taller'])),
             'patrulla' => $equipo,
             'estacion' => $agenda->estacionReservada($user),
         ])->title(__('jota.navegacion.actividades'));

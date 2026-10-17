@@ -83,18 +83,18 @@ it('informa lleno, duplicada, choque y turno ya empezado sin reservar de más', 
     expect(Reserva::where('user_id', $this->yo->id)->count())->toBe(1);
 });
 
-it('un taller en curso todavía deja anotarse: la agenda lo dice y el botón está activo; la estación en curso queda cerrada', function () {
+it('un taller en curso todavía deja anotarse: la agenda lo dice y el botón está activo; una estación en curso ajena no se muestra', function () {
     $taller = actividadPara($this->e->unidad, ['titulo' => 'IA para tus ideas']);
     $turno = turnoDe($taller, '-30 minutes', '+30 minutes', cupo: 50);
     $estacion = actividadPara($this->e->unidad, ['titulo' => 'Radio'], porEquipo: true);
     turnoDe($estacion, '-30 minutes', '+30 minutes', cupo: 1);
 
     $agenda = collect(app(AgendaDelParticipante::class)->actividades($this->yo))->keyBy('titulo');
-    expect($agenda['IA para tus ideas']['turnos'][0])->toMatchArray(['comenzado' => true, 'cerrado' => false, 'lugares' => 50])
-        ->and($agenda['Radio']['turnos'][0])->toMatchArray(['comenzado' => true, 'cerrado' => true]);
+    expect($agenda['IA para tus ideas']['turnos'][0])->toMatchArray(['comenzado' => true, 'cerrado' => false, 'lugares' => 50, 'estado' => 'en_curso'])
+        ->and($agenda)->not->toHaveKey('Radio'); // la estación ya empezó y no es de mi equipo: no se muestra
 
     $html = $this->actingAs($this->yo)->get(route('app.actividades'))->assertOk()->assertSee('En curso: todavía podés sumarte')->getContent();
-    expect(substr_count($html, 'wire:click="reservar('))->toBe(1); // solo el del taller; la estación en curso no tiene botón activo
+    expect(substr_count($html, 'wire:click="reservar('))->toBe(1)->and($html)->not->toContain('Radio'); // solo el del taller
 
     Livewire::actingAs($this->yo)->test(Agenda::class)->call('reservar', $turno->id)->assertSet('tono', 'exito')->assertSee('Te apuntaste a IA para tus ideas');
 });

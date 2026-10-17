@@ -97,6 +97,7 @@ test.describe('Registro JOTA y JOTI: cargar → validar → puntos', () => {
         await dir.goto('/dirigente/contactos');
         await dir.getByRole('link', { name: /Quito, Ecuador/ }).click();
         await dir.getByRole('button', { name: 'Rechazar' }).click();
+        await expect(dir.getByLabel('Motivo del rechazo')).toBeVisible(); // esperar al formulario antes de volver a tocar «Rechazar»
         await dir.getByRole('button', { name: 'Rechazar' }).click(); // sin motivo
         await expect(dir.getByText('Para rechazar tenés que escribir el motivo.')).toBeVisible();
         await dir.getByLabel('Motivo del rechazo').fill('No se ve la conversación');

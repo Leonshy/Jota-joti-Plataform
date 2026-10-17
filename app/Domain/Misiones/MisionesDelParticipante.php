@@ -35,7 +35,7 @@ class MisionesDelParticipante
                 'vence_at' => $m->vence_at,
                 'lanza_at' => $m->lanza_at,
             ])
-            // Primero lo que se puede hacer, después lo que espera, al final lo que ya terminó.
+            // Orden pedido por el grupo: rechazadas (hay que volver a entregar), nuevas, en revisión, aprobadas, vencidas y cerradas.
             ->sortBy([
                 fn ($a, $b) => $this->orden($a['estado']) <=> $this->orden($b['estado']),
                 fn ($a, $b) => $b['lanza_at'] <=> $a['lanza_at'],
@@ -91,7 +91,7 @@ class MisionesDelParticipante
 
     private function orden(string $estado): int
     {
-        return ['nueva' => 0, 'rechazada' => 0, 'pendiente' => 1, 'aprobada' => 2, 'vencida' => 3, 'cerrada' => 3][$estado];
+        return ['rechazada' => 0, 'nueva' => 1, 'pendiente' => 2, 'aprobada' => 3, 'vencida' => 4, 'cerrada' => 5][$estado];
     }
 
     /**

@@ -30,7 +30,7 @@ class AgendaDelParticipante
         $reservados = $propias->where('vigente', 1)->pluck('turno_id')->map(fn ($id) => (int) $id)->all();
         $apuntadas = $propias->pluck('actividad_id')->map(fn ($id) => (int) $id)->unique()->values()->all();
 
-        return Actividad::query()
+        $lista = Actividad::query()
             ->whereHas('unidades', fn (Builder $q) => $q->whereKey($user->unidad_id))
             ->with(['turnos' => fn ($q) => $q->where('fin', '>', now())->withCount('reservas')->orderBy('inicio')])
             ->orderBy('titulo')
@@ -55,6 +55,82 @@ class AgendaDelParticipante
                     'reservado' => in_array($t->getKey(), $reservados, true),
                 ])->all(),
             ])
+            ->all();
+
+        return $this->ordenar($lista);
+    }
+
+    /**
+     * Orden y filtro que pidió el grupo (17/10/2026). Primero los talleres y después las estaciones JOTA, y en cada grupo:
+     *  - TALLERES: en curso → con lugar → apuntado → lleno.
+     *  - ESTACIONES: reservado → disponible → en curso (de mi equipo). No se muestran las ocupadas por otro equipo, las bloqueadas
+     *    (mi equipo ya tiene otra) ni las que ya empezaron y no son de mi equipo.
+     * El orden de las actividades sale de su mejor turno; el de los turnos, del mismo criterio y después por horario.
+     *
+     * @param  list<array<string, mixed>>  $lista
+     * @return list<array<string, mixed>>
+     */
+    private function ordenar(array $lista): array
+    {
+        $tieneEstacion = collect($lista)->contains(fn ($a) => ! $a['taller'] && collect($a['turnos'])->contains('reservado', true));
+
+        $rango = [
+            'en_curso_taller' => 0, 'con_lugar' => 1, 'apuntado' => 2, 'lleno' => 3,
+            'reservado' => 0, 'disponible' => 1, 'en_curso_estacion' => 2,
+        ];
+
+        return collect($lista)
+            ->map(function (array $a) use ($tieneEstacion, $rango) {
+                $turnos = collect($a['turnos']);
+
+                if (! $a['taller']) {
+                    $turnos = $turnos->filter(fn ($t) => $t['reservado'] || (! $t['comenzado'] && $t['lugares'] !== 0 && ! $tieneEstacion));
+                }
+
+                $turnos = $turnos->map(function ($t) use ($a) {
+                    $estado = $a['taller']
+                        ? match (true) {
+                            $t['reservado'] => 'apuntado',
+                            $t['lugares'] === 0 => 'lleno',
+                            $t['comenzado'] => 'en_curso',
+                            default => 'con_lugar',
+                        }
+                    : match (true) {
+                        $t['reservado'] && $t['comenzado'] => 'en_curso',
+                        $t['reservado'] => 'reservado',
+                        default => 'disponible',
+                    };
+
+                    return $t + ['estado' => $estado];
+                });
+
+                $clave = fn (array $t) => $rango[$t['estado'] === 'en_curso' ? ($a['taller'] ? 'en_curso_taller' : 'en_curso_estacion') : $t['estado']];
+
+                // Dentro de una actividad en la que ya estoy apuntado, mi turno va arriba; si no, el criterio de siempre y después el horario.
+                $turnos = $turnos->sortBy([
+                    fn ($x, $y) => ($x['estado'] === 'apuntado' ? -1 : $clave($x)) <=> ($y['estado'] === 'apuntado' ? -1 : $clave($y)),
+                    fn ($x, $y) => $x['inicio'] <=> $y['inicio'],
+                ])->values();
+
+                // Rango de la actividad: apuntado cuenta como «apuntado» aunque sus otros turnos estén bloqueados.
+                $propios = $turnos->reject(fn ($t) => $t['estado'] === 'apuntado');
+                $a['rango'] = match (true) {
+                    $a['taller'] && ($a['apuntado'] || $turnos->contains('estado', 'apuntado')) => $rango['apuntado'],
+                    $turnos->isEmpty() => 99,
+                    default => $propios->map($clave)->min() ?? 99,
+                };
+                $a['turnos'] = $turnos->all();
+
+                return $a;
+            })
+            // Una estación sin turnos que mostrar no aparece. Un taller sin turnos sí (se avisa que no tiene turnos).
+            ->reject(fn ($a) => ! $a['taller'] && $a['turnos'] === [])
+            ->sortBy([
+                fn ($x, $y) => $y['taller'] <=> $x['taller'],
+                fn ($x, $y) => $x['rango'] <=> $y['rango'],
+                fn ($x, $y) => $x['titulo'] <=> $y['titulo'],
+            ])
+            ->values()
             ->all();
     }
 

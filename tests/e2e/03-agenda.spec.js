@@ -37,7 +37,7 @@ test.describe('Agenda y reservas', () => {
         await expect(page.getByText(/Choca con tu reserva/)).toBeVisible();
     });
 
-    test('en la estación cada horario es de un solo equipo: el otro equipo lo ve ocupado', async ({ browser }) => {
+    test('en la estación cada horario es de un solo equipo: el otro equipo ya no ve el horario ocupado', async ({ browser }) => {
         const estacion = (page, nombre) => page.getByRole('region', { name: nombre });
         const { page: aguilas } = await sesionDe(browser, '4000001');
         const { page: pumas } = await sesionDe(browser, '4000005');
@@ -46,20 +46,22 @@ test.describe('Agenda y reservas', () => {
         await estacion(aguilas, 'Estación JOTA: gran juego de patrullas').getByRole('listitem').first().getByRole('button', { name: /^Reservar/ }).click();
         await expect(aguilas.getByText(/¡Reservado!/)).toBeVisible();
 
+        // El otro equipo no ve el horario ocupado (ni ningún «ocupado por otro equipo»): solo el que sigue libre.
         await pumas.goto('/app/actividades');
-        const horario = estacion(pumas, 'Estación JOTA: gran juego de patrullas').getByRole('listitem').first();
-        await expect(horario.getByText(/Ocupado por otro equipo/)).toBeVisible();
-        await expect(horario.getByRole('button', { name: /^Reservar/ })).toBeDisabled();
+        const horarios = estacion(pumas, 'Estación JOTA: gran juego de patrullas').getByRole('listitem');
+        await expect(horarios).toHaveCount(1);
+        await expect(horarios.first().getByText(/Disponible/)).toBeVisible();
+        await expect(pumas.getByText(/Ocupado por otro equipo/)).toHaveCount(0);
     });
 
     test('un equipo reserva una sola estación a la vez, a cualquier hora, hasta que termine', async ({ browser }) => {
         const { page: compa } = await sesionDe(browser, '4000002'); // misma patrulla (Águilas) que reservó el gran juego
         await compa.goto('/app/actividades');
 
-        // El equipo ya tiene reservada una estación: ninguna otra se puede reservar, ni a otra hora.
+        // El equipo ya tiene reservada una estación: se ve esa, y las demás (bloqueadas) no se muestran.
         await expect(compa.getByText(/Tu equipo ya tiene reservada «Estación JOTA: gran juego de patrullas»/).first()).toBeVisible();
-        const radio = compa.getByRole('region', { name: 'Estación JOTA: radioaficionados' });
-        for (const boton of await radio.getByRole('button', { name: /^Reservar/ }).all()) await expect(boton).toBeDisabled();
+        await expect(compa.getByRole('region', { name: 'Estación JOTA: gran juego de patrullas' }).getByText('Reservado').first()).toBeVisible();
+        await expect(compa.getByRole('region', { name: 'Estación JOTA: radioaficionados' })).toHaveCount(0);
 
         // Los talleres no cuentan: siguen disponibles.
         await expect(compa.getByRole('region', { name: 'Taller de primeros auxilios' }).getByRole('button', { name: /^Apuntarme/ }).first()).toBeEnabled();
@@ -77,6 +79,7 @@ test.describe('Agenda y reservas', () => {
         // Otro Rover ve la estación reservada por su unidad y no puede reservar otra.
         await otro.goto('/app/actividades');
         await expect(otro.getByText(/Tu equipo ya tiene reservada «Estación JOTA: radioaficionados»/).first()).toBeVisible();
+        await expect(otro.getByRole('region', { name: 'Estación JOTA: gran juego de patrullas' })).toHaveCount(0);
         await otro.goto('/app/actividades/reservas');
         await expect(otro.getByText('Estación JOTA: radioaficionados')).toBeVisible();
         await expect(otro.getByText('Para tu equipo')).toBeVisible();
@@ -169,5 +172,24 @@ test.describe('Agenda y reservas', () => {
         await expect(taller.getByText(/En curso: todavía podés sumarte/)).toBeVisible();
         await taller.getByRole('button', { name: /^Apuntarme/ }).click();
         await expect(page.getByText(/Te apuntaste a/)).toBeVisible();
+    });
+
+    test('la agenda separa «Talleres» y «Estaciones JOTA», con los talleres primero', async ({ browser }) => {
+        const { page } = await sesionDe(browser, '4000012');
+        await page.goto('/app/actividades');
+
+        const talleres = page.getByRole('heading', { name: 'Talleres', level: 2 });
+        const estaciones = page.getByRole('heading', { name: 'Estaciones JOTA', level: 2 });
+        await expect(talleres).toBeVisible();
+        await expect(estaciones).toBeVisible();
+
+        const yTalleres = (await talleres.boundingBox()).y;
+        const yEstaciones = (await estaciones.boundingBox()).y;
+        expect(yTalleres).toBeLessThan(yEstaciones);
+
+        // Todo taller queda antes del encabezado de estaciones; toda estación, después.
+        const taller = await page.getByRole('region', { name: 'Taller de primeros auxilios' }).boundingBox();
+        expect(taller.y).toBeGreaterThan(yTalleres);
+        expect(taller.y).toBeLessThan(yEstaciones);
     });
 });

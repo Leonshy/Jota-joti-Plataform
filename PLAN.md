@@ -143,6 +143,9 @@ gastó esos LisCoins, y verifica que los saldos coincidan con los movimientos. C
 personas (Rovers); sin CI ni ids y con caché propia. El participante sigue anónimo (regla 8). Reemplaza a D6. 1.129 tests y 56 pruebas de navegador.
 **Inscripción a talleres hasta que terminen (17/10/2026):** un taller admite anotarse mientras el turno no termine (la agenda dice «En curso: todavía podés sumarte»); la
 estación JOTA sigue cerrando al empezar. Quien ya está anotado no puede cancelar un turno que empezó (solo el dirigente o el admin).
+**Orden de misiones y de la agenda (17/10/2026):** las misiones van rechazadas → nuevas → en revisión → aprobadas → vencidas → cerradas. La agenda separa «Talleres» y
+«Estaciones JOTA»: talleres en curso → con lugar → apuntado → lleno; estaciones reservada → disponible → en curso de mi equipo, y **no se muestran** las ocupadas por otro equipo
+ni las bloqueadas ni las ya empezadas ajenas.
 **Pendiente:** aprobación del diseño y del copy por Leonardo; fuente definitiva y tema del panel Filament (sigue con los colores por defecto).
 
 **Cierre:** diseño aprobado.
