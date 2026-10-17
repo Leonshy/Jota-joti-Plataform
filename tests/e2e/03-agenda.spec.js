@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { sesionDe } from './apoyo.mjs';
+import { tinker } from './entorno.mjs';
 
 test.describe('Agenda y reservas', () => {
     test('reservar, ver en «Mis reservas» y cancelar con confirmación', async ({ browser }) => {
@@ -119,5 +120,38 @@ test.describe('Agenda y reservas', () => {
         const otros = await taller.getByRole('button', { name: /^Apuntarme/ }).all();
         expect(otros.length).toBeGreaterThan(0);
         for (const boton of otros) await expect(boton).toBeDisabled();
+    });
+
+    test('con una estación reservada se puede apuntar a un taller que no se pisa; el que se pisa avisa del choque', async ({ browser }) => {
+        // Datos propios de esta prueba, así no dependen de los horarios que ocupan las otras: estación de +10 h a +11 h, y un taller
+        // con un turno que se pisa (+10 h 30 a +11 h 30) y otro que no (+12 h a +13 h).
+        tinker(`$tropa = App\\Models\\Unidad::where("nombre", "Tropa")->first();
+            $est = App\\Models\\Actividad::create(["tipo" => App\\Enums\\TipoActividad::EstacionJota, "titulo" => "Estación de horarios", "lugar" => "Cancha", "modalidad" => App\\Enums\\Modalidad::Patrulla, "puntos" => 1]);
+            $est->unidades()->attach($tropa); $est->turnos()->create(["inicio" => now()->addHours(10), "fin" => now()->addHours(11)]);
+            $tal = App\\Models\\Actividad::create(["tipo" => App\\Enums\\TipoActividad::Taller, "titulo" => "Taller de horarios", "lugar" => "Salón", "modalidad" => App\\Enums\\Modalidad::Individual, "puntos" => 1]);
+            $tal->unidades()->attach($tropa);
+            $tal->turnos()->create(["inicio" => now()->addHours(10)->addMinutes(30), "fin" => now()->addHours(11)->addMinutes(30), "cupo" => 5]);
+            $tal->turnos()->create(["inicio" => now()->addHours(12), "fin" => now()->addHours(13), "cupo" => 5]); echo "ok";`);
+
+        const { page } = await sesionDe(browser, '4000009');
+        await page.goto('/app/actividades');
+
+        // El equipo reserva la estación.
+        await page.getByRole('region', { name: 'Estación de horarios' }).getByRole('button', { name: /^Reservar/ }).click();
+        await expect(page.getByText(/¡Reservado!/)).toBeVisible();
+
+        // El primer turno del taller se pisa con la estación: avisa del choque.
+        const taller = page.getByRole('region', { name: 'Taller de horarios' });
+        await taller.getByRole('listitem').nth(0).getByRole('button', { name: /^Apuntarme/ }).click();
+        await expect(page.getByText(/Choca con/)).toBeVisible();
+
+        // El segundo turno no se pisa: se puede, aunque la estación siga reservada.
+        await taller.getByRole('listitem').nth(1).getByRole('button', { name: /^Apuntarme/ }).click();
+        await expect(page.getByText(/Te apuntaste a/)).toBeVisible();
+
+        // Las dos cosas aparecen en «Mis reservas».
+        await page.goto('/app/actividades/reservas');
+        await expect(page.getByText('Estación de horarios')).toBeVisible();
+        await expect(page.getByText('Taller de horarios')).toBeVisible();
     });
 });
