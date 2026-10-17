@@ -14,11 +14,13 @@ APP="${JOTA_APP:-/var/www/vhosts/naranja.com.py/jotajoti.naranja.com.py}"
 MAX_BUILD_BYTES=$((20 * 1024 * 1024))
 
 # Lo que pidió el cliente, cortado en palabras sin interpretarlo como comando.
-read -r CMD ARG EXTRA <<< "${SSH_ORIGINAL_COMMAND:-}"
+read -r CMD ARG ARG2 EXTRA <<< "${SSH_ORIGINAL_COMMAND:-}"
 
-rechazar() { echo "Comando no permitido: $1" >&2; echo "Permitidos: deploy | verificar | respaldos | consultar <CI> | simular-eliminacion <CI> | subir-build (tar por stdin)" >&2; exit 1; }
+rechazar() { echo "Comando no permitido: $1" >&2; echo "Permitidos: deploy | verificar | respaldos | consultar <CI> | simular-eliminacion <CI> | actividad <palabra> [CI] | subir-build (tar por stdin)" >&2; exit 1; }
 
 [ -z "${EXTRA:-}" ] || rechazar "demasiados argumentos"
+# Solo `actividad` admite un segundo argumento (el CI de la persona a probar).
+[ -z "${ARG2:-}" ] || [ "${CMD:-}" = "actividad" ] || rechazar "demasiados argumentos"
 
 case "${CMD:-}" in
     deploy)
@@ -62,6 +64,17 @@ PHP
     simular-eliminacion)
         [[ "${ARG:-}" =~ ^[0-9]{4,12}$ ]] || rechazar "simular-eliminacion necesita un CI (solo números)"
         cd "$APP" && "$PHP" artisan jota:eliminar-usuario-de-prueba "$ARG" --simulacro
+        ;;
+
+    # Diagnóstico de un taller o estación: turnos, cupos y reservas; con un CI, prueba (y deshace) si esa persona podría apuntarse.
+    actividad)
+        [[ "${ARG:-}" =~ ^[[:alnum:]áéíóúñÁÉÍÓÚÑ._-]{2,40}$ ]] || rechazar "actividad necesita UNA palabra del título (sin espacios)"
+        if [ -n "${ARG2:-}" ]; then
+            [[ "$ARG2" =~ ^[0-9]{4,12}$ ]] || rechazar "el segundo argumento es un CI (solo números)"
+            cd "$APP" && "$PHP" artisan jota:ver-actividad "$ARG" --ci="$ARG2"
+        else
+            cd "$APP" && "$PHP" artisan jota:ver-actividad "$ARG"
+        fi
         ;;
 
     # Los estilos y scripts compilados llegan como un tar por la entrada estándar. Solo se acepta una carpeta build/ sin rutas

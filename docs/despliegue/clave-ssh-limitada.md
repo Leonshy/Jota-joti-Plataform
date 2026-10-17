@@ -12,6 +12,7 @@ pida el cliente, el servidor ejecuta siempre `~/jota-ssh-comandos.sh`; nunca abr
 | `respaldos` | `backup:list` |
 | `consultar <CI>` | Solo lectura: datos, saldos y cantidad de registros de una persona |
 | `simular-eliminacion <CI>` | Solo simulacro de `jota:eliminar-usuario-de-prueba`: qué se borraría y qué saldos se corregirían. No cambia nada |
+| `actividad <palabra> [CI]` | Diagnóstico de un taller o estación: modalidad, unidades, turnos, cupos y reservas. Con un CI, prueba qué pasaría si esa persona intentara apuntarse (la prueba se deshace: no guarda nada) |
 | `subir-build` | Recibe `build/` como tar por stdin (máx. 20 MB, solo rutas `build/…`, escribe solo dentro de `public/`) |
 
 **No puede:** abrir una consola, leer el `.env` ni archivos, eliminar usuarios (solo simularlo), tocar saldos ni correr `artisan` libre. Eso sigue siendo
