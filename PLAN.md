@@ -146,6 +146,9 @@ estación JOTA sigue cerrando al empezar. Quien ya está anotado no puede cancel
 **Orden de misiones y de la agenda (17/10/2026):** las misiones van rechazadas → nuevas → en revisión → aprobadas → vencidas → cerradas. La agenda separa «Talleres» y
 «Estaciones JOTA»: talleres en curso → con lugar → apuntado → lleno; estaciones reservada → disponible → en curso de mi equipo, y **no se muestran** las ocupadas por otro equipo
 ni las bloqueadas ni las ya empezadas ajenas.
+**Datos de muestra para el entorno local (17/10/2026):** `php artisan db:seed --class=DatosDeMuestraSeeder` (después del seeder base) carga misiones en los seis estados, talleres y
+estaciones en todos sus estados, contactos JOTA/JOTI, ranking, tienda e historial, usando las acciones del sistema; nunca en producción. En la lista de misiones el estado va
+debajo del texto (con la etiqueta a la derecha el título se partía letra por letra en 360 px).
 **Pendiente:** aprobación del diseño y del copy por Leonardo; fuente definitiva y tema del panel Filament (sigue con los colores por defecto).
 
 **Cierre:** diseño aprobado.

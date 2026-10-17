@@ -10,6 +10,8 @@
         <span class="min-w-0 flex-1">
             <span class="block break-words font-bold leading-snug">{{ $titulo }}</span>
             @if ($subtitulo)<span class="block text-sm text-texto-suave">{{ $subtitulo }}</span>@endif
+            {{-- Debajo del texto: para etiquetas largas (estados) que, a la derecha, le dejarían al título casi nada de ancho. --}}
+            @isset($abajo)<span class="mt-1.5 block">{{ $abajo }}</span>@endisset
         </span>
         @isset($derecha)<span class="shrink-0">{{ $derecha }}</span>@endisset
         @if ($href)<x-heroicon-o-chevron-right class="size-5 shrink-0 text-texto-suave" aria-hidden="true" />@endif

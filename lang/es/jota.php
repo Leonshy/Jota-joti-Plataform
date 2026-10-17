@@ -234,7 +234,7 @@ return [
         'estacion_unica_aviso' => 'Tu equipo ya tiene reservada «:actividad» (:cuando). Pueden reservar otra estación cuando termine.',
         'una_estacion_a_la_vez' => 'Cada equipo reserva una estación a la vez.',
         'sin_limite' => 'Sin límite de lugares',
-        'sin_turnos' => 'Por ahora no hay turnos para reservar.',
+        'sin_turnos' => 'Por ahora no hay turnos disponibles.',
         'para_equipo' => 'Para tu equipo',
         'ver_agenda' => 'Ver la agenda',
         'error_duplicada' => 'Ya tenés reservado este turno.',
