@@ -136,6 +136,9 @@ las estaciones. 1.049 tests y 51 pruebas de navegador.
 del grupo + captura (suma a la persona); local por indicativo ZP / país Paraguay; cuatro puntajes que define el admin en el panel («Puntaje de contactos»); validación
 por el dirigente de la unidad o el admin, con rechazo definitivo; capturas privadas, sin EXIF y purgables. Legajo §4.5 bis. Tests de dominio, de pantallas y de
 concurrencia real, y 3 pruebas de navegador nuevas.
+**Cuenta de prueba en producción (17/10/2026):** `jota:eliminar-usuario-de-prueba {ci}` (excepción acordada a «los movimientos no se borran»): simulacro, respaldo previo,
+confirmación escribiendo el CI, una sola transacción, y revierte lo que la cuenta acreditó a su patrulla y compañeros; se niega si hubo tienda o si un compañero ya
+gastó esos LisCoins, y verifica que los saldos coincidan con los movimientos. Clave SSH limitada (`deploy/ssh-comandos.sh`). 1.120 tests.
 **Pendiente:** aprobación del diseño y del copy por Leonardo; fuente definitiva y tema del panel Filament (sigue con los colores por defecto).
 
 **Cierre:** diseño aprobado.

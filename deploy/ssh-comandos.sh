@@ -16,7 +16,7 @@ MAX_BUILD_BYTES=$((20 * 1024 * 1024))
 # Lo que pidió el cliente, cortado en palabras sin interpretarlo como comando.
 read -r CMD ARG EXTRA <<< "${SSH_ORIGINAL_COMMAND:-}"
 
-rechazar() { echo "Comando no permitido: $1" >&2; echo "Permitidos: deploy | verificar | respaldos | consultar <CI> | subir-build (tar por stdin)" >&2; exit 1; }
+rechazar() { echo "Comando no permitido: $1" >&2; echo "Permitidos: deploy | verificar | respaldos | consultar <CI> | simular-eliminacion <CI> | subir-build (tar por stdin)" >&2; exit 1; }
 
 [ -z "${EXTRA:-}" ] || rechazar "demasiados argumentos"
 
@@ -55,6 +55,13 @@ echo json_encode([
 PHP
 )"
         echo
+        ;;
+
+    # Solo SIMULACRO: muestra qué borraría y qué saldos corregiría `jota:eliminar-usuario-de-prueba`. Eliminar de verdad NO está acá:
+    # lo corre una persona, con su sesión y escribiendo el CI para confirmar.
+    simular-eliminacion)
+        [[ "${ARG:-}" =~ ^[0-9]{4,12}$ ]] || rechazar "simular-eliminacion necesita un CI (solo números)"
+        cd "$APP" && "$PHP" artisan jota:eliminar-usuario-de-prueba "$ARG" --simulacro
         ;;
 
     # Los estilos y scripts compilados llegan como un tar por la entrada estándar. Solo se acepta una carpeta build/ sin rutas
