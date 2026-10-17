@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Beneficiario;
 
+use App\Domain\Contactos\ContactosDelParticipante;
 use App\Domain\Inicio\ResumenParticipante;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -9,7 +10,7 @@ use Livewire\Component;
 #[Layout('components.layouts.movil')]
 class Inicio extends Component
 {
-    public function render(ResumenParticipante $resumen)
+    public function render(ResumenParticipante $resumen, ContactosDelParticipante $contactos)
     {
         $user = auth()->user();
 
@@ -17,6 +18,7 @@ class Inicio extends Component
         return view('livewire.beneficiario.inicio', [
             'nombre' => strtok($user->name, ' '),
             'resumen' => $resumen($user),
+            'contactos' => $contactos->resumen($user),
             'bienvenida' => session('bienvenida'),
         ])->title(__('jota.navegacion.inicio'));
     }

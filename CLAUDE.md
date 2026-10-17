@@ -61,7 +61,8 @@ Unidades: Tropa y Caminantes (ranking por equipo), Rovers (ranking individual).
 11. **Hora del servidor:** `America/Asuncion`. Toda comparación de lanzamiento, vencimiento o
     turno usa `now()` del servidor, nunca la hora del cliente.
 12. **Datos personales mínimos:** CI, nombre, grupo, unidad y patrulla. No agregar campos
-    personales sin pasar por el legajo.
+    personales sin pasar por el legajo. Única excepción (legajo §4.5 bis): los contactos JOTA/JOTI
+    guardan grupo, ciudad, unidad, país e indicativo del otro scout; nunca su nombre, teléfono ni correo.
 13. **Estaciones JOTA** (regla del grupo, 16/10/2026):
     - Son siempre **por equipo**: la patrulla en Tropa y Caminantes; en los Rovers, que no se arman por patrulla, el equipo es **toda la unidad**.
     - Cada horario es de **un solo equipo** (cupo 1): está disponible u ocupado.
@@ -69,6 +70,10 @@ Unidades: Tropa y Caminantes (ranking por equipo), Rovers (ranking individual).
     - Al cumplirla: patrulla → puntos a la patrulla y ⌈P/n⌉ LisCoins a cada integrante; Rovers → **cada Rover** recibe +P puntos y +P LisCoins.
     - Los talleres no tienen esta regla (pueden ser individuales o por equipo, con cupo de personas).
 14. **Copy en español paraguayo**, tono cercano y scout. Nada de textos en inglés en la UI.
+15. **Contactos JOTA y JOTI** (legajo §4.5 bis):
+    - JOTA (radio) suma a la **patrulla** (a cada Rover en los Rovers); JOTI (internet) suma a la **persona**. Los LisCoins son el mismo monto.
+    - Local = indicativo `ZP…` (JOTA) o país Paraguay (JOTI). El admin define cuatro puntajes; sin definir no se aprueba.
+    - Los valida el dirigente de la unidad o el admin; **un rechazado es definitivo**. La captura de JOTI se trata como las fotos de las misiones (regla 10).
 
 ---
 

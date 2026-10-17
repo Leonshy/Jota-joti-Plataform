@@ -20,6 +20,8 @@
         </x-ui.lista>
     @endif
 
+    <x-ui.boton variante="secundario" :href="route('dirigente.contactos')" icono="signal">{{ $contactos > 0 ? __('jota.contactos.dir_ver_n', ['n' => $contactos]) : __('jota.contactos.dir_ver') }}</x-ui.boton>
+
     <div class="flex flex-wrap items-center justify-between gap-2">
         <x-ui.boton variante="enlace" :bloque="false" :href="route('dirigente.ranking')" icono="trophy">{{ __('jota.dirigente.ver_ranking') }}</x-ui.boton>
         <x-ui.boton variante="enlace" :bloque="false" :href="route('dirigente.reservas')" icono="calendar-days">{{ __('jota.dirigente.reservas_ver') }}</x-ui.boton>

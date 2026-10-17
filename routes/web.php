@@ -4,6 +4,7 @@ use App\Domain\Acceso\DestinoPorRol;
 use App\Domain\Acceso\UnidadActiva;
 use App\Http\Controllers\AsistenciaPublicaController;
 use App\Http\Controllers\CobroController;
+use App\Http\Controllers\ContactoCapturaController;
 use App\Http\Controllers\DisenoController;
 use App\Http\Controllers\EntregaImagenController;
 use App\Http\Controllers\RankingController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\RegistrarAsistenciaController;
 use App\Livewire\Acceso\Activar;
 use App\Livewire\Acceso\Ingresar;
 use App\Livewire\Beneficiario\Agenda;
+use App\Livewire\Beneficiario\Contactos;
 use App\Livewire\Beneficiario\Entregar;
 use App\Livewire\Beneficiario\Historial as BeneficiarioHistorial;
 use App\Livewire\Beneficiario\Inicio as BeneficiarioInicio;
@@ -18,13 +20,16 @@ use App\Livewire\Beneficiario\Mision;
 use App\Livewire\Beneficiario\Misiones;
 use App\Livewire\Beneficiario\MisReservas;
 use App\Livewire\Beneficiario\Ranking as BeneficiarioRanking;
+use App\Livewire\Beneficiario\RegistrarContacto;
 use App\Livewire\Dirigente\Asistencia;
 use App\Livewire\Dirigente\Cola;
+use App\Livewire\Dirigente\ContactosPendientes;
 use App\Livewire\Dirigente\Cumplimientos;
 use App\Livewire\Dirigente\Penalizaciones;
 use App\Livewire\Dirigente\Ranking as DirigenteRanking;
 use App\Livewire\Dirigente\Reservas as DirigenteReservas;
 use App\Livewire\Dirigente\Revisar;
+use App\Livewire\Dirigente\RevisarContacto;
 use App\Livewire\Dirigente\Sesion;
 use App\Livewire\Tienda\Cobrar;
 use App\Livewire\Tienda\Devolver as TiendaDevolver;
@@ -58,6 +63,8 @@ Route::middleware(['auth', 'rol:beneficiario'])->prefix('app')->name('app.')->gr
     Route::livewire('/misiones/{mision}/entregar', Entregar::class)->name('entregar');
     Route::livewire('/actividades', Agenda::class)->name('actividades');
     Route::livewire('/actividades/reservas', MisReservas::class)->name('reservas');
+    Route::livewire('/contactos/{tipo}', Contactos::class)->name('contactos');
+    Route::livewire('/contactos/{tipo}/nuevo', RegistrarContacto::class)->name('contactos.nuevo');
     Route::view('/escanear', 'escanear')->name('escanear');
     Route::livewire('/historial', BeneficiarioHistorial::class)->name('historial');
 });
@@ -71,6 +78,8 @@ Route::middleware(['auth', 'rol:dirigente,admin'])->prefix('dirigente')->name('d
     })->name('unidad');
     Route::livewire('/', Cola::class)->name('inicio');
     Route::livewire('/entregas/{entrega}', Revisar::class)->name('revisar');
+    Route::livewire('/contactos', ContactosPendientes::class)->name('contactos');
+    Route::livewire('/contactos/{contacto}', RevisarContacto::class)->name('contacto');
     Route::livewire('/ranking', DirigenteRanking::class)->name('ranking');
     Route::livewire('/reservas', DirigenteReservas::class)->name('reservas');
     Route::livewire('/asistencia', Asistencia::class)->name('asistencia');
@@ -89,6 +98,7 @@ Route::middleware(['auth', 'rol:tienda,admin'])->prefix('tienda')->name('tienda.
 
 Route::middleware('auth')->group(function () {
     Route::get('/entregas/imagenes/{imagen}', [EntregaImagenController::class, 'show'])->name('entregas.imagen');
+    Route::get('/contactos/{contacto}/captura', [ContactoCapturaController::class, 'show'])->name('contactos.captura');
 
     Route::get('/ranking', RankingController::class)->name('ranking');
 

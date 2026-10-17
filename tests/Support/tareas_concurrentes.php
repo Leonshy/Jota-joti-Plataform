@@ -11,6 +11,10 @@ use App\Domain\Actividades\Reservar;
 use App\Domain\Actividades\SesionYaAbierta;
 use App\Domain\Actividades\TallerYaApuntado;
 use App\Domain\Actividades\TurnoLleno;
+use App\Domain\Contactos\AprobarContacto;
+use App\Domain\Contactos\ContactoInvalido;
+use App\Domain\Contactos\ContactoYaRevisado;
+use App\Domain\Contactos\RegistrarContactoJota;
 use App\Domain\Ledger\Jlis;
 use App\Domain\Ledger\Puntos;
 use App\Domain\Ledger\SaldoInsuficiente;
@@ -27,6 +31,7 @@ use App\Domain\Tienda\DevolucionExcedeCompras;
 use App\Domain\Tienda\Devolver;
 use App\Domain\Tienda\PagarCobro;
 use App\Models\Actividad;
+use App\Models\Contacto;
 use App\Models\Entrega;
 use App\Models\Mision;
 use App\Models\Patrulla;
@@ -213,6 +218,32 @@ function tareaAnularPenalizacion(int $autorId, int $penalizacionId): Closure
             return 'ok';
         } catch (PenalizacionYaAnulada) {
             return 'ya anulada';
+        }
+    };
+}
+
+function tareaAprobarContacto(int $contactoId, int $revisorId): Closure
+{
+    return static function () use ($contactoId, $revisorId) {
+        try {
+            app(AprobarContacto::class)(User::findOrFail($revisorId), Contacto::findOrFail($contactoId));
+
+            return 'ok';
+        } catch (ContactoYaRevisado) {
+            return 'ya revisado';
+        }
+    };
+}
+
+function tareaRegistrarJota(int $userId, array $datos): Closure
+{
+    return static function () use ($userId, $datos) {
+        try {
+            app(RegistrarContactoJota::class)(User::findOrFail($userId), $datos);
+
+            return 'ok';
+        } catch (ContactoInvalido) {
+            return 'repetido';
         }
     };
 }

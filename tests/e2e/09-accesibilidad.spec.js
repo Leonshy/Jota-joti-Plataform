@@ -10,8 +10,8 @@ import { sesionDe } from './apoyo.mjs';
 const ETIQUETAS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 
 const PANTALLAS = {
-    '4000001': ['/app', '/app/misiones', '/app/ranking', '/app/actividades', '/app/actividades/reservas', '/app/historial', '/app/escanear'],
-    '4000045': ['/dirigente', '/dirigente/ranking', '/dirigente/reservas', '/dirigente/asistencia', '/dirigente/cumplimientos', '/dirigente/penalizaciones'],
+    '4000001': ['/app', '/app/misiones', '/app/ranking', '/app/actividades', '/app/actividades/reservas', '/app/historial', '/app/escanear', '/app/contactos/jota', '/app/contactos/joti', '/app/contactos/jota/nuevo', '/app/contactos/joti/nuevo'],
+    '4000045': ['/dirigente', '/dirigente/ranking', '/dirigente/reservas', '/dirigente/asistencia', '/dirigente/cumplimientos', '/dirigente/penalizaciones', '/dirigente/contactos'],
     '4000048': ['/tienda', '/tienda/devolver', '/tienda/historial'],
 };
 

@@ -6,7 +6,7 @@ import { sesionDe } from './apoyo.mjs';
  * WCAG 1.4.4 (texto): con el texto al 200 % tampoco, y nada de lo que se puede tocar queda tapado por la barra de abajo.
  */
 const PANTALLAS = {
-    '4000001': ['/app', '/app/misiones', '/app/ranking', '/app/actividades', '/app/historial'],
+    '4000001': ['/app', '/app/misiones', '/app/ranking', '/app/actividades', '/app/historial', '/app/contactos/jota', '/app/contactos/joti/nuevo', '/app/contactos/jota/nuevo'],
     '4000045': ['/dirigente', '/dirigente/asistencia', '/dirigente/cumplimientos', '/dirigente/penalizaciones'],
     '4000048': ['/tienda', '/tienda/devolver', '/tienda/historial'],
 };

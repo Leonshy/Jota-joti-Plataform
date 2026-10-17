@@ -31,6 +31,24 @@
         </x-ui.tarjeta>
     @endif
 
+    {{-- Registro de contactos: JOTA (radio, suma a la patrulla) y JOTI (internet, suma a la persona). --}}
+    <div class="grid grid-cols-2 gap-3">
+        @foreach (['jota' => 'signal', 'joti' => 'globe-alt'] as $tipo => $icono)
+            <a href="{{ route('app.contactos', $tipo) }}" class="flex min-h-32 flex-col justify-between gap-2 rounded-md bg-superficie p-4 text-texto no-underline shadow-tarjeta transition duration-150 hover:bg-fondo-suave active:scale-[0.98] motion-reduce:active:scale-100">
+                <span class="flex items-center gap-2">
+                    <span class="grid size-11 shrink-0 place-items-center rounded-full bg-primario-suave text-primario">
+                        <x-dynamic-component :component="icono($icono)" class="size-6" aria-hidden="true" />
+                    </span>
+                    <span class="text-lg font-bold leading-tight">{{ __('jota.contactos.registro_'.$tipo) }}</span>
+                </span>
+                <span class="flex flex-col gap-0.5 text-sm text-texto-suave">
+                    <span>{{ __('jota.contactos.tarjeta_'.$tipo) }}</span>
+                    <span class="font-bold text-texto">{{ trans_choice('jota.contactos.aprobados', $contactos[$tipo]['aprobados'], ['count' => $contactos[$tipo]['aprobados']]) }}@if ($contactos[$tipo]['pendientes'] > 0) · {{ trans_choice('jota.contactos.por_revisar', $contactos[$tipo]['pendientes'], ['count' => $contactos[$tipo]['pendientes']]) }}@endif</span>
+                </span>
+            </a>
+        @endforeach
+    </div>
+
     <x-ui.seccion :titulo="__('jota.inicio.para_vos')">
         @if ($resumen['misiones_por_entregar'] === 0 && ! $resumen['proximo_turno'])
             <x-ui.vacio icono="sparkles" :titulo="__('jota.misiones.vacio_titulo')" :texto="__('jota.inicio.vacio')">

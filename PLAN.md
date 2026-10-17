@@ -132,6 +132,10 @@ muestra nada. 1.036 tests y 50 pruebas de navegador.
 todos sus turnos en el mismo formulario; en los talleres la gente se **apunta** («Apuntarme») y en las estaciones se **reserva**; un taller se cursa en **un solo turno**
 (persona o equipo; cuenta también un turno ya pasado); se pueden cursar varios talleres a la vez mientras no se pisen los horarios, sin la regla de «una a la vez» de
 las estaciones. 1.049 tests y 51 pruebas de navegador.
+**Registro de contactos JOTA y JOTI (16/10/2026):** dos tarjetas en el Inicio; JOTA = libro de guardia (suma a la patrulla; a cada Rover en los Rovers), JOTI = datos
+del grupo + captura (suma a la persona); local por indicativo ZP / país Paraguay; cuatro puntajes que define el admin en el panel («Puntaje de contactos»); validación
+por el dirigente de la unidad o el admin, con rechazo definitivo; capturas privadas, sin EXIF y purgables. Legajo §4.5 bis. Tests de dominio, de pantallas y de
+concurrencia real, y 3 pruebas de navegador nuevas.
 **Pendiente:** aprobación del diseño y del copy por Leonardo; fuente definitiva y tema del panel Filament (sigue con los colores por defecto).
 
 **Cierre:** diseño aprobado.

@@ -154,6 +154,8 @@ y donde el dirigente valida en segundos y nadie discute un puntaje porque todo q
 | Misión por patrulla aprobada | — | +P a la patrulla (una vez) | +⌈P / n⌉ a cada integrante |
 | Asistencia a actividad individual (QR) | +P a la persona | — | +P a la persona |
 | Actividad por equipo marcada cumplida | — | +P a la patrulla (una vez) | +⌈P / n⌉ a cada integrante |
+| Contacto JOTI aprobado (internet) | +P a la persona | — | +P a la persona |
+| Contacto JOTA aprobado (radio) | — | +P a la patrulla (una vez) | +⌈P / n⌉ a cada integrante |
 | Penalización a persona | −X a la persona | — | sin efecto |
 | Penalización a patrulla | — | −X a la patrulla | sin efecto |
 | Cobro en la tienda | sin efecto | sin efecto | −M a la persona |
@@ -165,6 +167,22 @@ y donde el dirigente valida en segundos y nadie discute un puntaje porque todo q
 
 - **Penalizaciones:** apartado propio, con motivo obligatorio y cantidad. Se aplican a una persona
   o a una patrulla, según el caso. Las aplica el dirigente de la unidad o el administrador.
+
+**4.5 bis Registro de contactos JOTA y JOTI** *(agregado el 16/10/2026, a pedido del grupo)*
+- En el Inicio del participante hay dos tarjetas, **Registro JOTA** (radio) y **Registro JOTI** (internet).
+- **JOTA** copia el libro de guardia: fecha, hora, estación (indicativo), RST de emisión y de recepción, frecuencia, modo de
+  emisión, observaciones y las casillas QSL R / QSL E. Lo carga cualquier integrante de la patrulla y **suma a la patrulla**
+  (en los Rovers, a cada Rover). Es **local** si el indicativo empieza con **ZP** (Paraguay). No lleva captura.
+- **JOTI** pide los datos del grupo con el que se habló (grupo scout, ciudad, unidad y país) y **una captura de pantalla de la
+  conversación**. **Suma a la persona.** Es **local** si el país es Paraguay. Sin tope de contactos por persona.
+- Cada contacto lo **valida el dirigente de la unidad o el administrador**: aprueba o rechaza con motivo. **Un contacto
+  rechazado queda rechazado: no se puede reenviar ni volver a revisar.**
+- El administrador define en el panel **cuatro puntajes**: JOTA local, JOTA exterior, JOTI local y JOTI exterior. Los LisCoins
+  son el mismo monto (con la regla de siempre para la patrulla). **Sin puntaje definido no se puede aprobar.**
+- **Datos de terceros, mínimos:** se guardan solo el grupo, la ciudad, la unidad y el país del otro scout, y en JOTA el
+  indicativo y las observaciones. **Nunca nombres, teléfonos ni correos.** Las capturas siguen las reglas de las fotos de las
+  misiones (disco privado, re-codificadas sin EXIF, solo las ven quien las cargó, el dirigente de la unidad y el admin) y se
+  borran después del evento con `jota:purgar-entregas`.
 
 **4.6 Tienda**
 - El usuario de tienda ingresa el monto y genera un **QR de cobro**, de un solo uso y con
@@ -352,7 +370,8 @@ y reporta diferencias.
     GPS de las fotos de menores).
   - Límite de 8 MB por archivo y 4 imágenes por entrega.
 - **Datos personales:** solo CI, nombre, grupo, unidad y patrulla. Sin teléfono, sin email, sin
-  fecha de nacimiento.
+  fecha de nacimiento. Excepción acordada el 16/10/2026 (§4.5 bis): los contactos JOTA y JOTI guardan
+  datos mínimos de terceros (grupo, ciudad, unidad, país, indicativo), nunca nombres ni contactos.
 - **Auditoría:** cada movimiento guarda quién lo registró. El panel muestra el historial por
   persona y por patrulla.
 - **Pentest con strix** antes de producción: cero hallazgos Críticos o Altos.
