@@ -49,6 +49,20 @@ class Turno extends Model
         return $this->inicio->lte(now());
     }
 
+    public function haTerminado(): bool
+    {
+        return $this->fin->lte(now());
+    }
+
+    /**
+     * ¿Se puede reservar o anotarse ahora? Los talleres admiten anotarse hasta que el turno TERMINA (decisión del grupo, 17/10/2026);
+     * las estaciones JOTA, que son de un equipo por horario, solo hasta que empieza.
+     */
+    public function admiteReservas(): bool
+    {
+        return $this->actividad->esEstacion() ? ! $this->haComenzado() : ! $this->haTerminado();
+    }
+
     public function tieneReservas(): bool
     {
         return $this->reservas()->exists();

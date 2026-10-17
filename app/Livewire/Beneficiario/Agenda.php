@@ -12,6 +12,7 @@ use App\Domain\Actividades\SinPatrulla;
 use App\Domain\Actividades\TallerYaApuntado;
 use App\Domain\Actividades\TurnoLleno;
 use App\Domain\Actividades\TurnoYaComenzo;
+use App\Domain\Actividades\TurnoYaTermino;
 use App\Models\Turno;
 use Illuminate\Auth\Access\AuthorizationException;
 use Livewire\Attributes\Layout;
@@ -62,6 +63,8 @@ class Agenda extends Component
             $this->mensaje = __('jota.actividades.error_sin_patrulla');
         } catch (TurnoYaComenzo) {
             $this->mensaje = __('jota.actividades.ya_empezo');
+        } catch (TurnoYaTermino) {
+            $this->mensaje = __('jota.actividades.ya_termino');
         } catch (EstacionEnCurso $e) {
             $this->mensaje = __('jota.actividades.error_estacion_en_curso', ['actividad' => $e->actividad, 'inicio' => $e->inicio->format('H:i'), 'fin' => $e->fin->format('H:i')]);
         } catch (ChoqueDeHorario $e) {

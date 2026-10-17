@@ -20,7 +20,7 @@ class AgendaDelParticipante
     /**
      * @return list<array{
      *     id: int, titulo: string, lugar: string|null, taller: bool, por_equipo: bool, puntos: int, apuntado: bool,
-     *     turnos: list<array{id: int, inicio: CarbonInterface, fin: CarbonInterface, lugares: int|null, comenzado: bool, reservado: bool}>
+     *     turnos: list<array{id: int, inicio: CarbonInterface, fin: CarbonInterface, lugares: int|null, comenzado: bool, cerrado: bool, reservado: bool}>
      * }>
      */
     public function actividades(User $user): array
@@ -50,6 +50,8 @@ class AgendaDelParticipante
                     'fin' => $t->fin,
                     'lugares' => $t->cupo === null ? null : max(0, $t->cupo - $t->reservas_count),
                     'comenzado' => $t->haComenzado(),
+                    // Un taller admite anotarse hasta que termina (y acá solo se listan turnos que no terminaron); la estación, hasta que empieza.
+                    'cerrado' => $a->esEstacion() && $t->haComenzado(),
                     'reservado' => in_array($t->getKey(), $reservados, true),
                 ])->all(),
             ])

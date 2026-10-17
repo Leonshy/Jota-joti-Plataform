@@ -222,6 +222,8 @@ return [
         'reservado' => 'Reservado',
         'reservado_texto' => '¡Reservado! :actividad, :cuando.',
         'en_curso' => 'En curso',
+        'en_curso_sumarse' => 'En curso: todavía podés sumarte',
+        'ya_termino' => 'Este turno ya terminó: no se puede anotar.',
         'disponible' => 'Disponible',
         'ocupado' => 'Ocupado por otro equipo',
         'error_estacion_en_curso' => 'Tu equipo ya tiene reservada «:actividad» de :inicio a :fin. Pueden reservar otra estación cuando termine.',

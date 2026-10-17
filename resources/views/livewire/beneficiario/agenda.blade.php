@@ -50,17 +50,19 @@
                                     <p class="numeros text-lg font-bold">{{ $t['inicio']->format('H:i') }} – {{ $t['fin']->format('H:i') }}</p>
                                     <p class="text-sm text-texto-suave">
                                         {{ $t['inicio']->isToday() ? __('jota.comun.hoy') : $t['inicio']->locale('es')->isoFormat('ddd D MMM') }}
-                                        · @if ($t['comenzado']) {{ __('jota.actividades.en_curso') }}
+                                        · @if ($t['comenzado'] && ! $a['taller']) {{ __('jota.actividades.en_curso') }}
                                         @elseif (! $a['taller']) {{-- Estación JOTA: un solo equipo por horario, solo está disponible u ocupado --}}
                                             {{ $t['reservado'] ? __('jota.actividades.reservado') : ($t['lugares'] === 0 ? __('jota.actividades.ocupado') : __('jota.actividades.disponible')) }}
                                         @else
+                                            {{-- Taller: se puede anotar hasta que el turno termina, aunque ya esté en curso. --}}
+                                            @if ($t['comenzado']){{ __('jota.actividades.en_curso_sumarse') }} · @endif
                                             {{ $t['lugares'] === null ? __('jota.actividades.sin_limite') : trans_choice($a['por_equipo'] ? 'jota.actividades.lugares_patrullas' : 'jota.actividades.lugares', $t['lugares']) }}
                                         @endif
                                     </p>
                                 </div>
                                 @if ($t['reservado'])
                                     <x-ui.insignia tono="exito">{{ $a['taller'] ? __('jota.actividades.apuntado') : __('jota.actividades.reservado') }}</x-ui.insignia>
-                                @elseif ($t['comenzado'] || $t['lugares'] === 0 || ($a['por_equipo'] && ! $patrulla) || (! $a['taller'] && $estacion) || $yaApuntado)
+                                @elseif ($t['cerrado'] || $t['lugares'] === 0 || ($a['por_equipo'] && ! $patrulla) || (! $a['taller'] && $estacion) || $yaApuntado)
                                     <x-ui.boton :bloque="false" :deshabilitado="true" class="min-h-tactil! px-5!">{{ $etiqueta }}</x-ui.boton>
                                 @else
                                     <x-ui.boton :bloque="false" aria-label="{{ $etiqueta.' '.$a['titulo'].', '.$t['inicio']->format('H:i') }}" wire:click="reservar({{ $t['id'] }})" wire:loading.attr="disabled" wire:target="reservar({{ $t['id'] }})" class="min-h-tactil! px-5!">{{ $etiqueta }}</x-ui.boton>

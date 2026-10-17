@@ -154,4 +154,20 @@ test.describe('Agenda y reservas', () => {
         await expect(page.getByText('Estación de horarios')).toBeVisible();
         await expect(page.getByText('Taller de horarios')).toBeVisible();
     });
+
+    test('un taller que ya empezó todavía deja anotarse hasta que termina', async ({ browser }) => {
+        // Un taller con un turno que empezó hace 15 minutos y termina en 45.
+        tinker(`$tropa = App\\Models\\Unidad::where("nombre", "Tropa")->first();
+            $tal = App\\Models\\Actividad::create(["tipo" => App\\Enums\\TipoActividad::Taller, "titulo" => "Taller en curso", "lugar" => "Auditorio", "modalidad" => App\\Enums\\Modalidad::Individual, "puntos" => 1]);
+            $tal->unidades()->attach($tropa);
+            $tal->turnos()->create(["inicio" => now()->subMinutes(15), "fin" => now()->addMinutes(45), "cupo" => 50]); echo "ok";`);
+
+        const { page } = await sesionDe(browser, '4000010');
+        await page.goto('/app/actividades');
+
+        const taller = page.getByRole('region', { name: 'Taller en curso' });
+        await expect(taller.getByText(/En curso: todavía podés sumarte/)).toBeVisible();
+        await taller.getByRole('button', { name: /^Apuntarme/ }).click();
+        await expect(page.getByText(/Te apuntaste a/)).toBeVisible();
+    });
 });

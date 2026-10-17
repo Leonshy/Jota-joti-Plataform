@@ -75,10 +75,28 @@ it('informa lleno, duplicada, choque y turno ya empezado sin reservar de más', 
     $choca = turnoDe($otra, '+3 hours +30 minutes', '+5 hours');
     $c->call('reservar', $choca->id)->assertSet('tono', 'aviso')->assertSee(__('jota.actividades.error_choque_propio', ['actividad' => $a->titulo, 'inicio' => $ok->inicio->format('H:i'), 'fin' => $ok->fin->format('H:i')]));
 
-    $empezado = turnoDe($a, '-5 minutes', '+1 hour');
-    $c->call('reservar', $empezado->id)->assertSet('mensaje', __('jota.actividades.ya_empezo'));
+    // Una estación que ya empezó no se reserva; un taller que ya terminó tampoco.
+    $estacion = actividadPara($this->e->unidad, ['titulo' => 'Radio'], porEquipo: true);
+    $c->call('reservar', turnoDe($estacion, '-5 minutes', '+1 hour', cupo: 1)->id)->assertSet('mensaje', __('jota.actividades.ya_empezo'));
+    $c->call('reservar', turnoDe($a, '-3 hours', '-2 hours')->id)->assertSet('mensaje', __('jota.actividades.ya_termino'));
 
     expect(Reserva::where('user_id', $this->yo->id)->count())->toBe(1);
+});
+
+it('un taller en curso todavía deja anotarse: la agenda lo dice y el botón está activo; la estación en curso queda cerrada', function () {
+    $taller = actividadPara($this->e->unidad, ['titulo' => 'IA para tus ideas']);
+    $turno = turnoDe($taller, '-30 minutes', '+30 minutes', cupo: 50);
+    $estacion = actividadPara($this->e->unidad, ['titulo' => 'Radio'], porEquipo: true);
+    turnoDe($estacion, '-30 minutes', '+30 minutes', cupo: 1);
+
+    $agenda = collect(app(AgendaDelParticipante::class)->actividades($this->yo))->keyBy('titulo');
+    expect($agenda['IA para tus ideas']['turnos'][0])->toMatchArray(['comenzado' => true, 'cerrado' => false, 'lugares' => 50])
+        ->and($agenda['Radio']['turnos'][0])->toMatchArray(['comenzado' => true, 'cerrado' => true]);
+
+    $html = $this->actingAs($this->yo)->get(route('app.actividades'))->assertOk()->assertSee('En curso: todavía podés sumarte')->getContent();
+    expect(substr_count($html, 'wire:click="reservar('))->toBe(1); // solo el del taller; la estación en curso no tiene botón activo
+
+    Livewire::actingAs($this->yo)->test(Agenda::class)->call('reservar', $turno->id)->assertSet('tono', 'exito')->assertSee('Te apuntaste a IA para tus ideas');
 });
 
 it('no reserva en una actividad de otra unidad', function () {

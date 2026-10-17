@@ -35,12 +35,18 @@ it('con un CI prueba la reserva y dice que sí se puede, sin dejar ninguna reser
     expect(Reserva::count())->toBe(0);
 });
 
-it('explica por qué NO: turno lleno, ya empezó, choque de horario y ya apuntado a ese taller', function () {
+it('explica por qué NO: turno lleno, taller terminado, estación empezada y choque de horario', function () {
     $lleno = turnoDe($this->taller, '+2 hours', '+3 hours', cupo: 1);
     Reserva::create(['turno_id' => $lleno->id, 'user_id' => $this->e->miembros[1]->id]);
-    $empezado = turnoDe($this->taller, '-1 hour', '+1 hour', cupo: 50);
+    turnoDe($this->taller, '-3 hours', '-2 hours', cupo: 50); // ya terminó
+    turnoDe($this->taller, '-1 hour', '+1 hour', cupo: 50); // en curso: en un taller todavía se puede
 
-    expect(verActividad(['texto' => 'IA', '--ci' => $this->yo->ci]))->toContain('TurnoLleno', 'YA EMPEZÓ', 'TurnoYaComenzo');
+    $salida = verActividad(['texto' => 'IA', '--ci' => $this->yo->ci]);
+    expect($salida)->toContain('TurnoLleno', 'TERMINÓ', 'TurnoYaTermino', 'en curso (aún se puede anotar)', 'SÍ se puede');
+
+    $estacion = actividadPara($this->e->unidad, ['titulo' => 'Radio de prueba'], true);
+    turnoDe($estacion, '-10 minutes', '+50 minutes', cupo: 1);
+    expect(verActividad(['texto' => 'Radio de prueba', '--ci' => $this->yo->ci]))->toContain('YA EMPEZÓ (cerrado)', 'TurnoYaComenzo');
 
     // Choque con otra reserva suya a la misma hora.
     $otro = actividadPara($this->e->unidad, ['titulo' => 'Ciberseguridad']);

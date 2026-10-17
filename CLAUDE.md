@@ -69,6 +69,7 @@ Unidades: Tropa y Caminantes (ranking por equipo), Rovers (ranking individual).
     - Un equipo reserva **una sola estación a la vez**, a cualquier hora, hasta que termine la que reservó (o la cancele).
     - Al cumplirla: patrulla → puntos a la patrulla y ⌈P/n⌉ LisCoins a cada integrante; Rovers → **cada Rover** recibe +P puntos y +P LisCoins.
     - Los talleres no tienen esta regla (pueden ser individuales o por equipo, con cupo de personas).
+    - Cierre de inscripción: la **estación** solo se reserva hasta que el turno empieza; el **taller**, hasta que el turno termina (decisión del grupo, 17/10/2026).
 14. **Copy en español paraguayo**, tono cercano y scout. Nada de textos en inglés en la UI.
 15. **Contactos JOTA y JOTI** (legajo §4.5 bis):
     - JOTA (radio) suma a la **patrulla** (a cada Rover en los Rovers); JOTI (internet) suma a la **persona**. Los LisCoins son el mismo monto.

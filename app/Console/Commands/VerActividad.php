@@ -63,7 +63,12 @@ class VerActividad extends Command
                     $t->cupo ?? 'sin tope',
                     $t->reservas_count,
                     $t->cupo === null ? '—' : max(0, $t->cupo - $t->reservas_count),
-                    $t->haComenzado() ? 'YA EMPEZÓ' : 'abierto',
+                    match (true) {
+                        $t->haTerminado() => 'TERMINÓ',
+                        $t->haComenzado() && $a->esEstacion() => 'YA EMPEZÓ (cerrado)',
+                        $t->haComenzado() => 'en curso (aún se puede anotar)',
+                        default => 'abierto',
+                    },
                 ];
 
                 return $user ? [...$fila, $this->probar($user, $a, $t)] : $fila;

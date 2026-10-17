@@ -29,7 +29,8 @@ class Reservar
     /**
      * @throws AuthorizationException
      * @throws SinPatrulla
-     * @throws TurnoYaComenzo
+     * @throws TurnoYaComenzo estación que ya empezó
+     * @throws TurnoYaTermino taller que ya terminó
      * @throws ReservaDuplicada
      * @throws TurnoLleno
      * @throws ChoqueDeHorario
@@ -49,11 +50,16 @@ class Reservar
             throw new SinPatrulla;
         }
 
-        return DB::transaction(function () use ($user, $turno, $equipo) {
+        return DB::transaction(function () use ($user, $turno, $equipo, $actividad) {
             $actual = Turno::query()->whereKey($turno->getKey())->lockForUpdate()->firstOrFail();
 
-            if ($actual->haComenzado()) {
-                throw new TurnoYaComenzo;
+            // OJO: no hacer ninguna lectura SIN bloqueo (ni un with()) antes de tomar todos los bloqueos de abajo. En REPEATABLE READ esa
+            // primera lectura fija la instantánea de la transacción: si después se espera un bloqueo y otra reserva se confirma mientras
+            // tanto, esta transacción no la vería y dejaría pasar un choque o un cupo de más. Por eso se usa la actividad ya cargada.
+            $actual->setRelation('actividad', $actividad);
+
+            if (! $actual->admiteReservas()) {
+                throw $actual->haTerminado() ? new TurnoYaTermino : new TurnoYaComenzo;
             }
 
             // Se bloquea siempre en el mismo orden (turno → equipo → personas por id) para que dos reservas simultáneas no se crucen.

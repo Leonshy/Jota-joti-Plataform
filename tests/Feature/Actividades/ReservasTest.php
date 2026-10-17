@@ -7,6 +7,7 @@ use App\Domain\Actividades\Reservar;
 use App\Domain\Actividades\SinPatrulla;
 use App\Domain\Actividades\TurnoLleno;
 use App\Domain\Actividades\TurnoYaComenzo;
+use App\Domain\Actividades\TurnoYaTermino;
 use App\Enums\Rol;
 use App\Enums\TipoActividad;
 use App\Models\Patrulla;
@@ -68,8 +69,21 @@ it('no se reserva una actividad de otra unidad ni como dirigente', function () {
         ->and(fn () => ($this->reservar)($this->e->dirigente, $propia))->toThrow(AuthorizationException::class);
 });
 
-it('no se reserva un turno que ya empezó', function () {
-    $turno = turnoDe(actividadPara($this->e->unidad), '-10 minutes', '+50 minutes');
+it('en un TALLER se puede anotar hasta que el turno termina, aunque ya haya empezado', function () {
+    $enCurso = turnoDe(actividadPara($this->e->unidad), '-10 minutes', '+50 minutes', cupo: 5);
+
+    expect(($this->reservar)($this->yo, $enCurso))->toBeInstanceOf(Reserva::class);
+});
+
+it('en un taller que ya TERMINÓ no se puede anotar', function () {
+    $terminado = turnoDe(actividadPara($this->e->unidad), '-2 hours', '-1 hour', cupo: 5);
+
+    expect(fn () => ($this->reservar)($this->yo, $terminado))->toThrow(TurnoYaTermino::class);
+    expect(Reserva::count())->toBe(0);
+});
+
+it('en una ESTACIÓN JOTA no se reserva un turno que ya empezó', function () {
+    $turno = turnoDe(actividadPara($this->e->unidad, [], true), '-10 minutes', '+50 minutes');
 
     ($this->reservar)($this->yo, $turno);
 })->throws(TurnoYaComenzo::class);
