@@ -3,6 +3,11 @@
 
     <x-ui.selector-unidad />
 
+    {{-- Contactos JOTA y JOTI: arriba de todo, para no tener que bajar hasta el final de la lista de entregas. --}}
+    <x-ui.boton :variante="$contactos > 0 ? 'primario' : 'secundario'" :href="route('dirigente.contactos')" icono="signal">{{ $contactos > 0 ? __('jota.contactos.dir_ver_n', ['n' => $contactos]) : __('jota.contactos.dir_ver') }}</x-ui.boton>
+
+    <h2 class="text-lg">{{ __('jota.dirigente.cola_seccion') }}</h2>
+
     @if ($filas === [])
         <x-ui.vacio icono="check-circle" :titulo="__('jota.dirigente.cola_vacia_titulo')" :texto="__('jota.dirigente.cola_vacia_texto')" />
     @else
@@ -19,8 +24,6 @@
             @endforeach
         </x-ui.lista>
     @endif
-
-    <x-ui.boton variante="secundario" :href="route('dirigente.contactos')" icono="signal">{{ $contactos > 0 ? __('jota.contactos.dir_ver_n', ['n' => $contactos]) : __('jota.contactos.dir_ver') }}</x-ui.boton>
 
     <div class="flex flex-wrap items-center justify-between gap-2">
         <x-ui.boton variante="enlace" :bloque="false" :href="route('dirigente.ranking')" icono="trophy">{{ __('jota.dirigente.ver_ranking') }}</x-ui.boton>

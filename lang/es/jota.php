@@ -359,6 +359,7 @@ return [
     'dirigente' => [
         'cola_titulo' => 'Cola de validación',
         'cola_pendientes' => '{0} Nada por revisar|{1} 1 por revisar|[2,*] :count por revisar',
+        'cola_seccion' => 'Entregas de misiones',
         'cola_orden' => 'Las más antiguas primero.',
         'ver_ranking' => 'Ver el ranking de la unidad',
         'cola_vacia_titulo' => 'No hay nada para revisar',

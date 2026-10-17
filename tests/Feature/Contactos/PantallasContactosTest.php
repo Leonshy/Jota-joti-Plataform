@@ -10,6 +10,7 @@ use App\Enums\Rol;
 use App\Livewire\Beneficiario\RegistrarContacto;
 use App\Livewire\Dirigente\RevisarContacto;
 use App\Models\Contacto;
+use App\Models\Entrega;
 use App\Models\Unidad;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
@@ -135,6 +136,17 @@ it('el dirigente ve los contactos pendientes de su unidad (JOTA y JOTI) y no los
         ->assertSee('2 contactos por revisar')->assertSee('Cusco, Perú')->assertSee('LU1ABC')->assertDontSee('Ajena');
     $this->actingAs($this->dir)->get(route('dirigente.inicio'))->assertOk()->assertSee('Contactos por revisar (2)');
     $this->actingAs($this->yo)->get(route('dirigente.contactos'))->assertForbidden();
+});
+
+it('en la cola del dirigente, el botón de contactos está ARRIBA de las entregas, no al final', function () {
+    $mision = misionPara($this->e->unidad, ['titulo' => 'Misión con entrega pendiente']);
+    Entrega::factory()->create(['mision_id' => $mision->id, 'user_id' => $this->yo->id, 'estado' => EstadoEntrega::Pendiente]);
+    ($this->nuevoJoti)();
+
+    $html = $this->actingAs($this->dir)->get(route('dirigente.inicio'))->assertOk()->assertSee('Entregas de misiones')->getContent();
+
+    expect(strpos($html, 'Contactos por revisar (1)'))->toBeLessThan(strpos($html, 'Entregas de misiones'))
+        ->and(strpos($html, 'Contactos por revisar (1)'))->toBeLessThan(strpos($html, 'Misión con entrega pendiente'));
 });
 
 it('la revisión muestra los datos y la captura, y aprobar acredita el puntaje definido', function () {
