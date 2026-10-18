@@ -31,7 +31,9 @@ de una persona con su propia sesión.
 ```bash
 ssh -i ~/.ssh/jota_plesk naranjacom@64.176.19.59 verificar
 ssh -i ~/.ssh/jota_plesk naranjacom@64.176.19.59 consultar 12345678
-(cd public && tar -cf - build) | ssh -i ~/.ssh/jota_plesk naranjacom@64.176.19.59 subir-build
+# IMPORTANTE: subir el build ANTES de «deploy», y si falla, no seguir (el código nuevo necesita los scripts nuevos).
+# COPYFILE_DISABLE=1 evita que el tar de macOS agregue metadatos ocultos que el servidor rechaza.
+(cd public && COPYFILE_DISABLE=1 tar -cf - build) | ssh -i ~/.ssh/jota_plesk naranjacom@64.176.19.59 subir-build
 ssh -i ~/.ssh/jota_plesk naranjacom@64.176.19.59 deploy
 ```
 Cualquier otra cosa devuelve «Comando no permitido».
