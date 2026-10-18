@@ -177,6 +177,7 @@ return [
         'error_vacia' => 'Escribí algo o subí al menos una foto.',
         'error_muchas_fotos' => 'Podés subir hasta 4 fotos.',
         'error_foto_pesada' => 'Cada foto puede pesar hasta 8 MB.',
+        'error_subida' => 'No pudimos subir la foto. Probá de nuevo, con otra foto o con mejor señal.',
         'error_foto_formato' => 'Solo se aceptan fotos JPG, PNG o WebP.',
         'error_texto_largo' => 'El texto puede tener hasta 2000 caracteres.',
         'error_vencida' => 'La misión ya venció. Tu entrega no se envió.',
@@ -551,6 +552,7 @@ return [
         'captura' => 'Captura de la conversación',
         'captura_agregar' => 'Subir captura',
         'captura_quitar' => 'Quitar la captura',
+        'error_subida' => 'No pudimos subir la captura. Probá de nuevo, con otra imagen o con mejor señal.',
         'captura_ayuda' => 'Una captura de pantalla de la conversación (JPG, PNG o WebP, hasta 8 MB). Solo la ven los dirigentes de tu unidad.',
         'privacidad' => 'No pongas teléfonos ni correos: no los necesitamos.',
 

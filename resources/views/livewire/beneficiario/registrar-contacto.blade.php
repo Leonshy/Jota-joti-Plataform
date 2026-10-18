@@ -9,7 +9,7 @@
     </x-ui.pantalla>
 @else
     <x-ui.pantalla :volver="route('app.contactos', $tipo)" :titulo="__('jota.contactos.form_titulo', ['tipo' => __('jota.contactos.'.$tipo)])">
-        <form wire:submit="enviar" class="flex flex-col gap-5" novalidate>
+        <form wire:submit="enviar" class="flex flex-col gap-5" novalidate x-data="{ subiendo: false }">
             @if ($error)
                 <x-ui.aviso tono="error" :titulo="__('jota.contactos.error_general')">{{ $error }}</x-ui.aviso>
             @endif
@@ -65,25 +65,27 @@
                         </div>
                     @else
                         <label class="relative grid aspect-[4/3] cursor-pointer place-items-center rounded-sm border-2 border-dashed border-primario bg-fondo-suave text-primario transition duration-150 hover:bg-primario-suave active:bg-primario-suave has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-azul-600">
-                            <input type="file" wire:model="captura" accept="image/*" class="sr-only">
-                            <span class="flex flex-col items-center gap-1 text-sm font-bold" wire:loading.remove wire:target="captura">
+                            {{-- Se achica la captura en el celular antes de subirla (ver jotaFotoLiviana en app.js). --}}
+                            <input type="file" accept="image/*" class="sr-only"
+                                x-on:change="const f = $event.target.files[0]; $event.target.value = ''; if (f) { subiendo = true; jotaFotoLiviana(f).then((a) => $wire.upload('captura', a, () => subiendo = false, () => subiendo = false)).catch(() => subiendo = false) }">
+                            <span class="flex flex-col items-center gap-1 text-sm font-bold" x-show="! subiendo">
                                 <x-heroicon-o-camera class="size-7" aria-hidden="true" />
                                 {{ __('jota.contactos.captura_agregar') }}
                             </span>
-                            <span class="flex flex-col items-center gap-1 text-sm font-bold" wire:loading wire:target="captura">
+                            <span class="flex flex-col items-center gap-1 text-sm font-bold" x-show="subiendo" style="display: none">
                                 <x-heroicon-o-arrow-path class="size-7 animate-giro" aria-hidden="true" />
                                 {{ __('jota.comun.cargando') }}
                             </span>
                         </label>
                     @endif
                     @if ($errors->has('captura'))
-                        <p class="mt-2 text-sm font-bold text-error-texto" role="alert">{{ $errors->first('captura') }}</p>
+                        <p class="mt-2 text-sm font-bold text-error-texto" role="alert">{{ \Illuminate\Support\Str::startsWith($errors->first('captura'), ['validation.', 'The ']) ? __('jota.contactos.error_subida') : $errors->first('captura') }}</p>
                     @endif
                     <p class="mt-2 text-xs text-texto-suave">{{ __('jota.contactos.captura_ayuda') }} {{ __('jota.contactos.privacidad') }}</p>
                 </div>
             @endif
 
-            <x-ui.boton type="submit" icono="paper-airplane" wire:loading.attr="disabled" wire:target="enviar,captura">{{ __('jota.contactos.enviar') }}</x-ui.boton>
+            <x-ui.boton type="submit" icono="paper-airplane" wire:loading.attr="disabled" wire:target="enviar" x-bind:disabled="subiendo">{{ __('jota.contactos.enviar') }}</x-ui.boton>
         </form>
     </x-ui.pantalla>
 @endif

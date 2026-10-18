@@ -20,7 +20,8 @@ php(['artisan', 'tinker', '--execute', `
 `]);
 
 // Varios procesos de PHP, como un servidor real (el servidor de desarrollo por defecto atiende de a una petición).
-const servidor = spawn('php', ['-S', '127.0.0.1:8123', '-t', resolve('public'), resolve('vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php')], {
+// Con los límites chicos que trae Plesk por defecto (2 MB por archivo): la app tiene que andar igual con fotos de celular.
+const servidor = spawn('php', ['-d', 'upload_max_filesize=2M', '-d', 'post_max_size=8M', '-d', 'memory_limit=128M', '-S', '127.0.0.1:8123', '-t', resolve('public'), resolve('vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php')], {
     cwd: resolve('public'), // el enrutador de Laravel busca index.php desde public/
     env: { ...process.env, ...ENTORNO, PHP_CLI_SERVER_WORKERS: '8' },
     stdio: ['ignore', 'ignore', 'pipe'],

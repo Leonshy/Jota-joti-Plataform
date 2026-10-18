@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { FOTO, saldo, sesionDe } from './apoyo.mjs';
+import { FOTO, imagenPesada, saldo, sesionDe } from './apoyo.mjs';
 
 test.describe('Misiones: entregar → revisar → puntos', () => {
     test('el participante entrega con texto y foto, y el dirigente aprueba', async ({ browser }) => {
@@ -91,5 +91,22 @@ test.describe('Misiones: entregar → revisar → puntos', () => {
         await page.getByRole('button', { name: 'Enviar entrega' }).click();
 
         await expect(page.getByText('Escribí algo o subí al menos una foto.')).toBeVisible();
+    });
+
+    test('una foto de celular pesada (5 MB) se sube igual aunque el servidor limite a 2 MB: se achica antes', async ({ browser }) => {
+        const { page } = await sesionDe(browser, '4000007');
+
+        await page.goto('/app/misiones');
+        await page.getByRole('link', { name: /Bienvenida al JOTA-JOTI/ }).click();
+        await page.getByRole('link', { name: 'Entregar' }).click();
+
+        await page.locator('input[type=file]').setInputFiles(imagenPesada('jpg'));
+        await expect(page.getByText('Fotos (1 de 4)')).toBeVisible();
+        // Nada de «validation.uploaded» ni de mensajes en inglés.
+        await expect(page.locator('[role=alert]')).toHaveCount(0);
+
+        await page.getByLabel('Contanos qué hiciste').fill('Con una foto pesada.');
+        await page.getByRole('button', { name: 'Enviar entrega' }).click();
+        await expect(page.getByRole('heading', { name: '¡Entrega enviada!' })).toBeVisible();
     });
 });

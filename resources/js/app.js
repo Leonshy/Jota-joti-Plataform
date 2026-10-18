@@ -5,6 +5,40 @@
  * Livewire trae su propio Alpine; esto es solo para los momentos con animación propia.
  */
 
+/**
+ * Achica una foto ANTES de subirla: máximo 1600 px de lado y JPEG de calidad 0,82, que es lo mismo en lo que el servidor la
+ * convierte igual. Una foto de celular pasa de varios MB a unos cientos de KB: sube rápido con datos móviles, no choca con el
+ * límite de subida de PHP del servidor (que en Plesk suele ser de 2 MB) y no le exige memoria de más a la cola de imágenes.
+ * Además la foto sale sin EXIF (ubicación GPS). Si el navegador no sabe leer el formato (p. ej. HEIC), se manda tal cual y valida
+ * el servidor. Se usa desde las pantallas con `x-on:change` y `$wire.upload(...)`.
+ */
+window.jotaFotoLiviana = async function (archivo, lado = 1600, calidad = 0.82) {
+    if (! archivo || ! archivo.type?.startsWith('image/')) return archivo;
+
+    try {
+        const imagen = await createImageBitmap(archivo, { imageOrientation: 'from-image' });
+        const escala = Math.min(1, lado / Math.max(imagen.width, imagen.height));
+        const lienzo = document.createElement('canvas');
+        lienzo.width = Math.max(1, Math.round(imagen.width * escala));
+        lienzo.height = Math.max(1, Math.round(imagen.height * escala));
+
+        const contexto = lienzo.getContext('2d');
+        contexto.fillStyle = '#fff'; // las capturas PNG con transparencia no quedan negras al pasar a JPEG
+        contexto.fillRect(0, 0, lienzo.width, lienzo.height);
+        contexto.drawImage(imagen, 0, 0, lienzo.width, lienzo.height);
+        imagen.close?.();
+
+        const blob = await new Promise((resolver) => lienzo.toBlob(resolver, 'image/jpeg', calidad));
+
+        // Si no mejoró (ya era chica), se sube la original.
+        if (! blob || (escala === 1 && blob.size >= archivo.size)) return archivo;
+
+        return new File([blob], (archivo.name.replace(/\.[^.]+$/, '') || 'foto') + '.jpg', { type: 'image/jpeg' });
+    } catch {
+        return archivo;
+    }
+};
+
 const reducirMovimiento = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const salida = (t) => 1 - Math.pow(1 - t, 4); // exponencial, como --ease-salida
 const formato = new Intl.NumberFormat('es-PY');

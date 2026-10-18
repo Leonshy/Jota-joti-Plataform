@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { FOTO, sesionDe } from './apoyo.mjs';
+import { FOTO, imagenPesada, sesionDe } from './apoyo.mjs';
 import { tinker } from './entorno.mjs';
 
 /** Define el puntaje de los contactos como lo haría el admin desde el panel. */
@@ -108,5 +108,15 @@ test.describe('Registro JOTA y JOTI: cargar → validar → puntos', () => {
         await expect(ana.getByText('Rechazado').first()).toBeVisible();
         await expect(ana.getByText('No se ve la conversación')).toBeVisible();
         await expect(ana.getByText('no se puede volver a enviar').first()).toBeVisible();
+    });
+
+    test('una captura PNG pesada (3 MB) de JOTI se sube igual con el límite de 2 MB del servidor', async ({ browser }) => {
+        definirPuntajes();
+        const { page } = await sesionDe(browser, '4000006');
+
+        await page.goto('/app/contactos/joti/nuevo');
+        await page.locator('input[type=file]').setInputFiles(imagenPesada('png'));
+        await expect(page.getByRole('button', { name: 'Quitar la captura' })).toBeVisible();
+        await expect(page.locator('[role=alert]')).toHaveCount(0);
     });
 });

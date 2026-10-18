@@ -11,7 +11,7 @@
     <x-ui.pantalla :volver="route('app.mision', $mision)" :titulo="__('jota.misiones.entrega_titulo')">
         <p class="text-texto-suave">{{ $mision->titulo }} · {{ __('jota.misiones.entrega_subtitulo') }}</p>
 
-        <form wire:submit="enviar" class="flex flex-col gap-5" novalidate>
+        <form wire:submit="enviar" class="flex flex-col gap-5" novalidate x-data="{ subiendo: false }">
             <x-ui.campo name="texto" wire:model="texto" :label="__('jota.misiones.texto_label')" :area="true"
                 :ayuda="$errors->has('texto') ? null : __('jota.misiones.texto_ayuda')" :error="$errors->first('texto') ?: null" />
 
@@ -34,12 +34,14 @@
 
                     @if (count($fotos) < 4)
                         <label class="relative grid aspect-[4/3] cursor-pointer place-items-center rounded-sm border-2 border-dashed border-primario bg-fondo-suave text-primario transition duration-150 hover:bg-primario-suave active:bg-primario-suave has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-azul-600">
-                            <input type="file" wire:model="nueva" accept="image/*" class="sr-only">
-                            <span class="flex flex-col items-center gap-1 text-sm font-bold" wire:loading.remove wire:target="nueva">
+                            {{-- Se achica la foto en el celular antes de subirla (ver jotaFotoLiviana en app.js). --}}
+                            <input type="file" accept="image/*" class="sr-only"
+                                x-on:change="const f = $event.target.files[0]; $event.target.value = ''; if (f) { subiendo = true; jotaFotoLiviana(f).then((a) => $wire.upload('nueva', a, () => subiendo = false, () => subiendo = false)).catch(() => subiendo = false) }">
+                            <span class="flex flex-col items-center gap-1 text-sm font-bold" x-show="! subiendo">
                                 <x-heroicon-o-camera class="size-7" aria-hidden="true" />
                                 {{ __('jota.misiones.foto_agregar') }}
                             </span>
-                            <span class="flex flex-col items-center gap-1 text-sm font-bold" wire:loading wire:target="nueva">
+                            <span class="flex flex-col items-center gap-1 text-sm font-bold" x-show="subiendo" style="display: none">
                                 <x-heroicon-o-arrow-path class="size-7 animate-giro" aria-hidden="true" />
                                 {{ __('jota.comun.cargando') }}
                             </span>
@@ -47,12 +49,12 @@
                     @endif
                 </div>
                 @if ($errors->has('fotos') || $errors->has('nueva'))
-                    <p class="mt-2 text-sm font-bold text-error-texto" role="alert">{{ $errors->first('fotos') ?: $errors->first('nueva') }}</p>
+                    <p class="mt-2 text-sm font-bold text-error-texto" role="alert">{{ $errors->first('fotos') ?: __('jota.misiones.error_subida') }}</p>
                 @endif
                 <p class="mt-2 text-xs text-texto-suave">{{ __('jota.misiones.fotos_ayuda') }}</p>
             </div>
 
-            <x-ui.boton type="submit" icono="paper-airplane" wire:loading.attr="disabled" wire:target="enviar,nueva">{{ __('jota.misiones.enviar') }}</x-ui.boton>
+            <x-ui.boton type="submit" icono="paper-airplane" wire:loading.attr="disabled" wire:target="enviar" x-bind:disabled="subiendo">{{ __('jota.misiones.enviar') }}</x-ui.boton>
         </form>
     </x-ui.pantalla>
 @endif

@@ -1,5 +1,7 @@
 import { expect } from '@playwright/test';
-import { tinker } from './entorno.mjs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { php, tinker } from './entorno.mjs';
 
 export const PIN = '1234';
 
@@ -41,4 +43,15 @@ export function urlQrCobro() {
 
 export function saldo(ci) {
     return JSON.parse(tinker(`$u = App\\Models\\User::where("ci", "${ci}")->first(); echo json_encode(["puntos" => $u->puntos, "jlis" => $u->jlis]);`));
+}
+
+/** Crea una imagen PESADA (ruido, que no se comprime) y devuelve su ruta. `tipo`: 'jpg' (≈5 MB) o 'png' (≈3 MB). */
+export function imagenPesada(tipo = 'jpg') {
+    const ruta = join(tmpdir(), `pesada-${Date.now()}-${tipo === 'jpg' ? '5mb.jpg' : '3mb.png'}`);
+    const codigo = tipo === 'jpg'
+        ? `mt_srand(7); $w=3000; $h=2200; $im=imagecreatetruecolor($w,$h); for($y=0;$y<$h;$y+=2){for($x=0;$x<$w;$x+=2){imagefilledrectangle($im,$x,$y,$x+1,$y+1,imagecolorallocate($im,mt_rand(0,255),mt_rand(0,255),mt_rand(0,255)));}} imagejpeg($im,'${ruta}',88);`
+        : `mt_srand(9); $w=900; $h=1600; $im=imagecreatetruecolor($w,$h); for($y=0;$y<$h;$y++){for($x=0;$x<$w;$x++){imagesetpixel($im,$x,$y,imagecolorallocate($im,mt_rand(0,255),mt_rand(0,255),mt_rand(0,255)));}} imagepng($im,'${ruta}',1);`;
+    php(['-r', codigo]);
+
+    return ruta;
 }
