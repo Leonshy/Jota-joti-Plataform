@@ -16,7 +16,7 @@ MAX_BUILD_BYTES=$((20 * 1024 * 1024))
 # Lo que pidió el cliente, cortado en palabras sin interpretarlo como comando.
 read -r CMD ARG ARG2 EXTRA <<< "${SSH_ORIGINAL_COMMAND:-}"
 
-rechazar() { echo "Comando no permitido: $1" >&2; echo "Permitidos: deploy | verificar | respaldos | consultar <CI> | simular-eliminacion <CI> | actividad <palabra> [CI] | subir-build (tar por stdin)" >&2; exit 1; }
+rechazar() { echo "Comando no permitido: $1" >&2; echo "Permitidos: deploy | verificar | respaldos | consultar <CI> | simular-eliminacion <CI> | actividad <palabra> [CI] | cola | subir-build (tar por stdin)" >&2; exit 1; }
 
 [ -z "${EXTRA:-}" ] || rechazar "demasiados argumentos"
 # Solo `actividad` admite un segundo argumento (el CI de la persona a probar).
@@ -64,6 +64,11 @@ PHP
     simular-eliminacion)
         [[ "${ARG:-}" =~ ^[0-9]{4,12}$ ]] || rechazar "simular-eliminacion necesita un CI (solo números)"
         cd "$APP" && "$PHP" artisan jota:eliminar-usuario-de-prueba "$ARG" --simulacro
+        ;;
+
+    # Solo lectura: trabajos pendientes y fallidos de la cola (fotos), con el motivo del fallo.
+    cola)
+        cd "$APP" && "$PHP" artisan jota:cola
         ;;
 
     # Diagnóstico de un taller o estación: turnos, cupos y reservas; con un CI, prueba (y deshace) si esa persona podría apuntarse.
