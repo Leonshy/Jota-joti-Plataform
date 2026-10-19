@@ -47,6 +47,33 @@
                         </table>
                     </div>
                 @endif
+
+                @php($personas = $this->personasPorUnidad()[$unidad] ?? [])
+                @if (! empty($personas))
+                    <h3 style="margin-top: 1.5rem; font-weight: 600;">Personas con más puntos</h3>
+                    <p style="font-size: .85rem; color: var(--gray-500);">Solo los puntos individuales: los de la patrulla no se suman acá.</p>
+                    <div style="overflow-x: auto; max-width: 36rem;">
+                        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                            <caption class="sr-only">Personas con más puntos de {{ $unidad }}</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col" style="padding: .5rem; border-bottom: 1px solid var(--gray-300); text-align: right;">Puesto</th>
+                                    <th scope="col" style="padding: .5rem; border-bottom: 1px solid var(--gray-300);">Participante</th>
+                                    <th scope="col" style="padding: .5rem; border-bottom: 1px solid var(--gray-300); text-align: right;">Puntos</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($personas as $p)
+                                    <tr @if ($p['posicion'] <= 3) style="font-weight: 700;" @endif>
+                                        <td style="padding: .4rem .5rem; border-bottom: 1px solid var(--gray-200); text-align: right;">{{ $p['posicion'] }}</td>
+                                        <td style="padding: .4rem .5rem; border-bottom: 1px solid var(--gray-200);">{{ $p['nombre'] }}</td>
+                                        <td style="padding: .4rem .5rem; border-bottom: 1px solid var(--gray-200); text-align: right;">{{ number_format($p['puntaje'], 0, ',', '.') }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
             </x-filament::section>
         @empty
             <p>Todavía no hay unidades cargadas.</p>

@@ -17,11 +17,19 @@ test.describe('Ranking: el dirigente ve nombres, el participante no', () => {
         const desborde = await dir.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
         expect(desborde).toBeLessThanOrEqual(0);
 
+        // Debajo, las personas con más puntos de la unidad: Puesto · Participante · Puntos (solo individuales), sin CI.
+        await expect(dir.getByRole('heading', { name: 'Personas con más puntos' })).toBeVisible();
+        const personas = dir.getByRole('table', { name: /Personas con más puntos/ });
+        await expect(personas.getByRole('columnheader', { name: 'Participante' })).toBeVisible();
+        await expect(personas.getByRole('columnheader', { name: 'Puntos' })).toBeVisible();
+        await expect(personas.getByRole('row')).not.toHaveCount(1); // hay encabezado y filas con personas
+
         // El participante, anónimo: ningún nombre de patrulla ni de persona.
         await ana.goto('/app/ranking');
         await expect(ana.getByRole('table')).toBeVisible();
         await expect(ana.getByText('Águilas')).toHaveCount(0);
         await expect(ana.getByText('Jaguares')).toHaveCount(0);
         await expect(ana.getByText('Águilas 2')).toHaveCount(0);
+        await expect(ana.getByText('Personas con más puntos')).toHaveCount(0);
     });
 });

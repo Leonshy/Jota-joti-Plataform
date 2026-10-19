@@ -202,12 +202,50 @@ it('el dirigente ve la tabla de su unidad CON los nombres de las patrullas, sin 
         ['posicion' => 1, 'patrulla' => 'Pumas', 'grupo' => 'G.S. General Aquino', 'puntos_patrulla' => 50, 'puntos_individuales' => 90, 'integrantes' => 3, 'puntaje' => 140],
         ['posicion' => 2, 'patrulla' => 'Águilas', 'grupo' => 'G.S. General Genes', 'puntos_patrulla' => 100, 'puntos_individuales' => 30, 'integrantes' => 2, 'puntaje' => 130],
         ['posicion' => 3, 'patrulla' => 'Zorros', 'grupo' => 'G.S. General Genes', 'puntos_patrulla' => 0, 'puntos_individuales' => 0, 'integrantes' => 0, 'puntaje' => 0],
-    ])->and(array_keys($vista))->toBe(['modo', 'tabla', 'se_actualiza_cada']);
+    ])->and(array_keys($vista))->toBe(['modo', 'tabla', 'personas', 'se_actualiza_cada']);
 
+    // Las patrullas van con nombre y las personas también, pero nunca el CI ni los ids.
     $json = json_encode($vista);
-    foreach (['Ana', 'Beto', 'Carla', $r->ana->ci, 'patrulla_id', 'user_id', '"ci"'] as $privado) {
+    foreach ([$r->ana->ci, $r->beto->ci, 'patrulla_id', 'user_id', '"ci"'] as $privado) {
         expect($json)->not->toContain($privado);
     }
+});
+
+it('las personas con más puntos de una unidad: puesto, nombre y puntos, con empates compartidos y solo puntos individuales', function () {
+    $r = rankingEquipo();
+
+    // Ana 10, Beto 20, Carla 40, Diego 40, Elena 10. Los puntos de las patrullas (100 y 50) NO cuentan para las personas.
+    expect($this->ranking->personas($r->unidad))->toEqual([
+        ['posicion' => 1, 'nombre' => 'Carla Duarte', 'puntaje' => 40],
+        ['posicion' => 1, 'nombre' => 'Diego Escobar', 'puntaje' => 40],
+        ['posicion' => 3, 'nombre' => 'Beto Cardozo', 'puntaje' => 20],
+        ['posicion' => 4, 'nombre' => 'Ana Benítez', 'puntaje' => 10],
+        ['posicion' => 4, 'nombre' => 'Elena Franco', 'puntaje' => 10],
+    ]);
+
+    // Solo participantes de esa unidad: ni el dirigente ni gente de otra unidad.
+    $otra = rankingEquipo('Caminantes');
+    $nombres = collect($this->ranking->personas($r->unidad))->pluck('nombre');
+    expect($nombres)->not->toContain('Dirigente Gómez')->and($this->ranking->personas($otra->unidad))->toHaveCount(5);
+});
+
+it('el dirigente recibe las personas de SU unidad; en Rovers no se repite (la tabla principal ya es de personas)', function () {
+    $r = rankingEquipo();
+    expect(collect($this->ranking->vistaDirigente($r->dirigente)['personas'])->pluck('nombre')->first())->toBe('Carla Duarte');
+
+    $rovers = Unidad::factory()->individual()->create(['nombre' => 'Rovers']);
+    $dir = User::factory()->rol(Rol::Dirigente)->create(['unidad_id' => $rovers->id]);
+    expect($this->ranking->vistaDirigente($dir)['personas'])->toBe([]);
+});
+
+it('el participante NO recibe la tabla de personas: su vista sigue anónima', function () {
+    $r = rankingEquipo();
+
+    $this->ranking->personas($r->unidad); // arma la caché con nombres
+    $vista = $this->ranking->vistaBeneficiario($r->ana);
+
+    expect($vista)->not->toHaveKey('personas')->and(json_encode($vista))->not->toContain('Carla')->not->toContain('Diego');
+    $this->actingAs($r->ana)->getJson(route('ranking'))->assertOk()->assertJsonMissingPath('personas');
 });
 
 it('en los Rovers (individual) el dirigente ve los nombres de las personas, sin CI', function () {
@@ -297,7 +335,7 @@ it('el endpoint del ranking responde por rol y no filtra identidades', function 
     // El dirigente sí recibe los nombres de las patrullas de su unidad, pero nunca CI ni ids.
     $dirigente = $this->actingAs($r->dirigente)->getJson(route('ranking'))->assertOk()->assertJsonMissingPath('mis_puntos')
         ->assertJsonPath('tabla.0.patrulla', 'Pumas');
-    expect($dirigente->getContent())->not->toContain($r->ana->ci)->not->toContain('patrulla_id')->not->toContain('Beto');
+    expect($dirigente->getContent())->not->toContain($r->ana->ci)->not->toContain('patrulla_id')->not->toContain($r->beto->ci);
 });
 
 it('el ranking pide sesión y se niega a tienda y admin (el admin usa el panel)', function () {

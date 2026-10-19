@@ -11,4 +11,12 @@
         <x-ui.tabla-ranking-nombres :titulo="__('jota.ranking.titulo', ['unidad' => $unidad])" :modo="$vista['modo']" :filas="$vista['tabla']" />
         <p class="text-sm text-texto-suave">{{ __('jota.ranking.empates') }} {{ __('jota.ranking.dirigente_nota') }}</p>
     @endif
+
+    {{-- Personas con más puntos (donde el ranking es por equipo): Puesto · Participante · Puntos. --}}
+    @if (! empty($vista['personas']))
+        <x-ui.seccion :titulo="__('jota.ranking.personas_titulo')">
+            <x-ui.tabla-personas :titulo="__('jota.ranking.personas_titulo').' · '.$unidad" :filas="$vista['personas']" />
+            <p class="text-sm text-texto-suave">{{ __('jota.ranking.personas_nota') }}</p>
+        </x-ui.seccion>
+    @endif
 </x-ui.pantalla>

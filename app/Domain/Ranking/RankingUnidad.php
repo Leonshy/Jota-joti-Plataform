@@ -85,9 +85,30 @@ class RankingUnidad
     }
 
     /**
+     * Las personas de una unidad ordenadas por sus puntos INDIVIDUALES (los de la patrulla no cuentan acá), con posición de competencia
+     * (1, 2, 2, 4). Solo nombre y puntos: sin CI, ids ni patrulla. Para el dirigente y el admin; el participante no la ve.
+     *
+     * @return list<array{posicion: int, nombre: string, puntaje: int}>
+     */
+    public function personas(Unidad $unidad): array
+    {
+        return Cache::remember("ranking:personas:{$unidad->getKey()}", self::TTL, function () use ($unidad) {
+            $filas = DB::table('users')
+                ->where('unidad_id', $unidad->getKey())->where('rol', Rol::Beneficiario->value)
+                ->get(['name', 'puntos'])
+                ->map(fn ($f) => ['nombre' => $f->name, 'puntaje' => (int) $f->puntos, 'orden' => $f->name])
+                ->all();
+
+            return array_map(fn (array $f) => array_intersect_key($f, array_flip(['posicion', 'nombre', 'puntaje'])), $this->conPosiciones($filas));
+        });
+    }
+
+    /**
      * El dirigente ve la tabla de su unidad con nombres: patrullas (Tropa, Caminantes) o personas (Rovers).
      *
-     * @return array{modo: string, tabla: list<array<string, mixed>>, se_actualiza_cada: int}
+     * Donde el ranking es por equipo, trae además la tabla de personas con más puntos (en Rovers la tabla principal ya es de personas).
+     *
+     * @return array{modo: string, tabla: list<array<string, mixed>>, personas: list<array<string, mixed>>, se_actualiza_cada: int}
      */
     public function vistaDirigente(User $user, ?int $unidadId = null): array
     {
@@ -102,6 +123,7 @@ class RankingUnidad
         return [
             'modo' => $unidad->modo_ranking->value,
             'tabla' => $this->conNombres($unidad),
+            'personas' => $unidad->modo_ranking === ModoRanking::Equipo ? $this->personas($unidad) : [],
             'se_actualiza_cada' => self::TTL,
         ];
     }

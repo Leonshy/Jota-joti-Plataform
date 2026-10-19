@@ -149,6 +149,8 @@ ni las bloqueadas ni las ya empezadas ajenas.
 **Datos de muestra para el entorno local (17/10/2026):** `php artisan db:seed --class=DatosDeMuestraSeeder` (después del seeder base) carga misiones en los seis estados, talleres y
 estaciones en todos sus estados, contactos JOTA/JOTI, ranking, tienda e historial, usando las acciones del sistema; nunca en producción. En la lista de misiones el estado va
 debajo del texto (con la etiqueta a la derecha el título se partía letra por letra en 360 px).
+**Ranking de personas por unidad (19/10/2026):** debajo del ranking por equipo, el dirigente (su unidad) y el admin (todas) ven «Personas con más puntos»: Puesto · Participante · Puntos,
+solo puntos individuales, con empates compartidos y sin CI ni ids. En Rovers no se repite (su tabla ya es de personas). El participante sigue anónimo.
 **Pendiente:** aprobación del diseño y del copy por Leonardo; fuente definitiva y tema del panel Filament (sigue con los colores por defecto).
 
 **Cierre:** diseño aprobado.

@@ -1,6 +1,7 @@
 <?php
 
 use App\Domain\Penalizaciones\Penalizar;
+use App\Filament\Pages\RankingsCompletos;
 use App\Filament\Resources\Auditoria\ActividadAuditoriaResource;
 use App\Filament\Resources\Auditoria\Pages\ListAuditoria;
 use App\Filament\Resources\MovimientosJlis\MovimientoJliResource;
@@ -132,4 +133,14 @@ it('las páginas de edición cargan', function () {
 
 it('el panel está en español', function () {
     $this->get('/admin/participantes')->assertOk()->assertSee('Participantes')->assertSee('Estructura del evento');
+});
+
+it('el ranking completo del panel muestra las personas con más puntos de cada unidad por equipo', function () {
+    Filament::setCurrentPanel('admin');
+    $r = rankingEquipo();
+    $this->actingAs($admin = adminDePrueba());
+
+    $this->get('/admin/rankings')->assertOk()->assertSee('Personas con más puntos')->assertSee('Carla Duarte')->assertSee('Diego Escobar');
+    expect(collect(Livewire::test(RankingsCompletos::class)->instance()->personasPorUnidad()['Tropa'])->first())
+        ->toMatchArray(['posicion' => 1, 'puntaje' => 40]);
 });

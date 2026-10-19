@@ -5,6 +5,8 @@ namespace App\Filament\Pages;
 use App\Domain\Exportaciones\Csv;
 use App\Domain\Exportaciones\Exportaciones;
 use App\Domain\Ranking\RankingUnidad;
+use App\Enums\ModoRanking;
+use App\Models\Unidad;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Pages\Page;
@@ -37,6 +39,19 @@ class RankingsCompletos extends Page
     public function rankings(): array
     {
         return app(RankingUnidad::class)->todas(auth()->user());
+    }
+
+    /**
+     * Personas con más puntos de cada unidad que se rankea por equipo (en Rovers la tabla principal ya es de personas).
+     *
+     * @return array<string, list<array{posicion: int, nombre: string, puntaje: int}>>
+     */
+    public function personasPorUnidad(): array
+    {
+        $ranking = app(RankingUnidad::class);
+
+        return Unidad::query()->where('modo_ranking', ModoRanking::Equipo)->orderBy('id')->get()
+            ->mapWithKeys(fn (Unidad $u) => [$u->nombre => $ranking->personas($u)])->all();
     }
 
     protected function getHeaderActions(): array

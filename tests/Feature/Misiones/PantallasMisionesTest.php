@@ -235,8 +235,9 @@ it('el ranking del dirigente muestra los nombres de las patrullas, y el del part
 
     $this->actingAs($r->dirigente)->get(route('dirigente.ranking'))->assertOk()
         ->assertSee('Pumas')->assertSee('Águilas')->assertSee('G.S. General Aquino')->assertSee('3 integrantes')->assertSee('Patrulla 50 + individuales 90')
-        ->assertDontSee($r->ana->name)->assertDontSee($r->ana->ci);
+        ->assertSee('Personas con más puntos')->assertSee('Carla Duarte')->assertSee('Ana Benítez') // las personas, con nombre, para el dirigente
+        ->assertDontSee($r->ana->ci);
 
     $html = $this->actingAs($r->ana)->get(route('app.ranking'))->assertOk()->getContent();
-    expect($html)->not->toContain('Pumas')->not->toContain($r->beto->name);
+    expect($html)->not->toContain('Pumas')->not->toContain($r->beto->name)->not->toContain('Personas con más puntos');
 });
