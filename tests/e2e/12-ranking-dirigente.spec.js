@@ -7,9 +7,9 @@ test.describe('Ranking: el dirigente ve nombres, el participante no', () => {
         const { page: ana } = await sesionDe(browser, '4000001');
 
         await dir.goto('/dirigente/ranking');
-        const tabla = dir.getByRole('table');
-        await expect(tabla.getByText('Águilas')).toBeVisible();
-        await expect(tabla.getByText('Jaguares')).toBeVisible();
+        const tabla = dir.getByRole('table', { name: /^Ranking de/ }); // la de equipos (hay otra, la de personas)
+        await expect(tabla.getByText('Águilas', { exact: true })).toBeVisible();
+        await expect(tabla.getByText('Jaguares', { exact: true })).toBeVisible();
         await expect(tabla.getByText(/integrantes/).first()).toBeVisible();
         await expect(tabla.getByText(/Patrulla .* \+ individuales/).first()).toBeVisible();
         // Los nombres de las personas y los CI no aparecen: solo las patrullas.
